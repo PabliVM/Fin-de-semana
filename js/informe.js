@@ -55,10 +55,80 @@ function renderPanelInforme(container) {
 
   const body = qs('#informe-body', container);
   if (state.informeView === 'ficha') {
-    body.innerHTML = '<div class="rm-card"><p class="rm-card__text">Ficha individual — siguiente módulo.</p></div>';
+    renderFichaIndividual(body);
     return;
   }
   renderCalendarioGeneral(body);
+}
+
+function sightingsCountByTeam(technicianId) {
+  const counts = {};
+  state.sightings.forEach(function (s) {
+    if (s.technicianId !== technicianId) return;
+    [s.team1, s.team2].forEach(function (teamId) {
+      if (!teamId) return;
+      counts[teamId] = (counts[teamId] || 0) + 1;
+    });
+  });
+  return counts;
+}
+
+function renderFichaIndividual(body) {
+  const techs = sortedTechnicians();
+  if (!techs.length) {
+    body.innerHTML = '<div class="rm-card"><p class="rm-card__text">No hay técnicos todavía.</p></div>';
+    return;
+  }
+  if (!state.fichaTechnicianId || !techs.some(function (t) { return t.id === state.fichaTechnicianId; })) {
+    setState({ fichaTechnicianId: techs[0].id });
+  }
+  const tech = techs.find(function (t) { return t.id === state.fichaTechnicianId; });
+  const counts = sightingsCountByTeam(tech.id);
+  const totalVisionados = Object.keys(counts).reduce(function (sum, k) { return sum + counts[k]; }, 0);
+
+  const seguimiento = TEAMS
+    .filter(function (t) { return counts[t.id]; })
+    .map(function (t) { return { team: t, count: counts[t.id] }; });
+
+  const asignados = currentAssignmentsFor(tech.id)
+    .slice()
+    .sort(function (a, b) { return teamOrderIndex(a.teamId) - teamOrderIndex(b.teamId); })
+    .map(function (a) { return { team: teamById(a.teamId), count: counts[a.teamId] || 0 }; });
+
+  body.innerHTML =
+    '<div class="rm-field" style="max-width:320px;margin-bottom:16px">' +
+      '<label class="rm-label">Técnico</label>' +
+      '<select class="rm-select" id="ficha-tech-select">' +
+        techs.map(function (t) { return '<option value="' + t.id + '"' + (t.id === tech.id ? ' selected' : '') + '>' + safeText(t.fullName) + '</option>'; }).join('') +
+      '</select>' +
+    '</div>' +
+    '<div class="rm-card" style="margin-bottom:16px">' +
+      '<h3 class="rm-card__title">' + safeText(tech.fullName) + ' (' + safeText(tech.initials) + ')</h3>' +
+      '<p class="rm-card__text">Total de partidos vistos esta temporada: <strong>' + totalVisionados + '</strong></p>' +
+    '</div>' +
+    '<div class="rm-section-title">Sus equipos asignados</div>' +
+    (asignados.length
+      ? '<div class="assign-list" style="margin-bottom:20px">' +
+          asignados.map(function (a) {
+            return '<div class="assign-row"><span class="assign-row__team">' + safeText(a.team.name) + '</span>' +
+              '<span class="assign-row__dates">' + a.count + (a.count === 1 ? ' visionado' : ' visionados') + '</span></div>';
+          }).join('') +
+        '</div>'
+      : '<p class="rm-card__text" style="margin-bottom:20px">No tiene equipos asignados.</p>') +
+    '<div class="rm-section-title">Seguimiento por equipo</div>' +
+    (seguimiento.length
+      ? '<div class="assign-list">' +
+          seguimiento.map(function (s) {
+            return '<div class="assign-row"><span class="assign-row__team">' + safeText(s.team.name) + '</span>' +
+              '<span class="assign-row__dates">' + s.count + (s.count === 1 ? ' visionado' : ' visionados') + '</span></div>';
+          }).join('') +
+        '</div>'
+      : '<p class="rm-card__text">Todavía no ha visto ningún equipo esta temporada.</p>');
+
+  qs('#ficha-tech-select', body).addEventListener('change', function (e) {
+    setState({ fichaTechnicianId: e.target.value });
+    renderFichaIndividual(body);
+  });
 }
 
 function weekendsInSeason() {
