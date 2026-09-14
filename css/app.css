@@ -42,8 +42,17 @@
 .informe-table td:first-child {
   width: 55px;
   border-left: 0;
-  text-align: left;
-  padding-left: 8px;
+  text-align: center;
+  padding-left: 6px;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.informe-table td:first-child {
+  background: var(--rm-brand-primary);
+  color: var(--rm-white);
+  font-weight: 700;
 }
 
 .informe-cell .rm-chip {
