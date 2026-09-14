@@ -28,6 +28,24 @@
   flex-wrap: wrap;
 }
 
+.calendario-table th,
+.calendario-table td {
+  padding: 6px 4px;
+  min-width: 34px;
+  text-align: center;
+}
+
+.calendario-table th:first-child,
+.calendario-table td:first-child {
+  min-width: 60px;
+  text-align: left;
+  padding-left: 10px;
+}
+
+.calendario-table .weekend-col {
+  background: var(--rm-surface-alt);
+}
+
 .sightings-table th:first-child,
 .sightings-table td:first-child {
   width: 200px;
