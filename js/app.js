@@ -45,6 +45,7 @@ function boot() {
   if (firebaseReady) {
     initTechniciansData();
     initSightingsData();
+    initTeamDatesData();
   }
 }
 
