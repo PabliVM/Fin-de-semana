@@ -44,24 +44,26 @@ function renderPanelInicio(container) {
     (activeTechs.length ? renderSightingsTable(activeTechs, weekendDate, teamOptions)
       : '<div class="rm-card"><p class="rm-card__text">No hay técnicos activos. Da de alta técnicos en la pestaña Técnicos.</p></div>');
 
-  qsa('select[data-technician][data-slot]', container).forEach(function (select) {
-    select.addEventListener('change', function () { onSightingChange(select, weekendDate); });
+  qsa('select[data-technician][data-slot], input[data-technician][data-slot]', container).forEach(function (el) {
+    el.addEventListener('change', function () { onSightingChange(el, weekendDate); });
   });
 }
 
 function renderSightingsTable(techs, weekendDate, teamOptions) {
   return (
     '<div class="rm-table-wrap">' +
-      '<table class="rm-table">' +
+      '<table class="rm-table sightings-table">' +
         '<thead><tr>' +
           '<th>Técnico</th>' +
           '<th colspan="2">' + formatDate(weekendDate) + '</th>' +
+          '<th>Observaciones</th>' +
         '</tr></thead>' +
         '<tbody>' +
           techs.map(function (t) {
             const sighting = sightingFor(t.id, weekendDate);
             const v1 = sighting ? sighting.team1 || '' : '';
             const v2 = sighting ? sighting.team2 || '' : '';
+            const notes = sighting ? sighting.notes || '' : '';
             return (
               '<tr>' +
                 '<td>' + safeText(t.initials) + ' — ' + safeText(t.fullName) + '</td>' +
@@ -69,6 +71,7 @@ function renderSightingsTable(techs, weekendDate, teamOptions) {
                   teamOptions.replace('value="' + v1 + '"', 'value="' + v1 + '" selected') + '</select></td>' +
                 '<td><select class="rm-select" data-technician="' + t.id + '" data-slot="team2">' +
                   teamOptions.replace('value="' + v2 + '"', 'value="' + v2 + '" selected') + '</select></td>' +
+                '<td><input class="rm-input" type="text" data-technician="' + t.id + '" data-slot="notes" value="' + safeText(notes) + '" placeholder="—" /></td>' +
               '</tr>'
             );
           }).join('') +
@@ -78,17 +81,27 @@ function renderSightingsTable(techs, weekendDate, teamOptions) {
   );
 }
 
-function onSightingChange(select, weekendDate) {
-  const technicianId = select.dataset.technician;
-  const slot = select.dataset.slot; // 'team1' | 'team2'
+function onSightingChange(el, weekendDate) {
+  const technicianId = el.dataset.technician;
+  const slot = el.dataset.slot; // 'team1' | 'team2' | 'notes'
+
+  if (slot === 'notes') {
+    setDocument('sightings', sightingId(technicianId, weekendDate), {
+      technicianId: technicianId, weekendDate: weekendDate, notes: el.value.trim(),
+    })
+      .then(function () { showSuccess('Guardado.'); })
+      .catch(function (err) { showError(err.message); });
+    return;
+  }
+
   const otherSlot = slot === 'team1' ? 'team2' : 'team1';
-  const row = select.closest('tr');
+  const row = el.closest('tr');
   const otherSelect = qs('select[data-slot="' + otherSlot + '"]', row);
-  const value = select.value || null;
+  const value = el.value || null;
 
   if (value && otherSelect && otherSelect.value === value) {
     showError('Ese técnico ya tiene ese equipo en el otro hueco.');
-    select.value = '';
+    el.value = '';
     return;
   }
 
