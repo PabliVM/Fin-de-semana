@@ -1,0 +1,126 @@
+/* Estilos específicos de Técnicos RM. No mezclar con components.css del kit. */
+
+.hidden { display: none !important; }
+
+.rm-toast {
+  position: fixed;
+  z-index: 300;
+  bottom: 20px;
+  left: 50%;
+  padding: 12px 18px;
+  transform: translate(-50%, 20px);
+  border-radius: var(--rm-radius);
+  background: var(--rm-text);
+  color: var(--rm-white);
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--rm-transition);
+}
+
+.rm-toast.is-visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+.rm-toast--error { background: var(--rm-danger); }
+.rm-toast--success { background: var(--rm-success); }
+
+.rm-app-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--rm-border);
+  background: var(--rm-surface);
+}
+
+.tech-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tech-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--rm-border);
+  border-radius: var(--rm-radius);
+  background: var(--rm-surface);
+}
+
+.tech-row__avatar {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--rm-brand-primary);
+  color: var(--rm-white);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tech-row__main {
+  min-width: 0;
+  flex: 1;
+}
+
+.tech-row__name {
+  color: var(--rm-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tech-row__teams {
+  margin-top: 4px;
+  color: var(--rm-text-secondary);
+  font-size: 12px;
+}
+
+.tech-row__actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.tech-row.is-inactive {
+  opacity: 0.55;
+}
+
+.assign-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.assign-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--rm-border);
+  border-radius: var(--rm-radius-sm);
+  background: var(--rm-surface-alt);
+  font-size: 12px;
+}
+
+.assign-row__team {
+  flex: 1;
+  font-weight: 600;
+  color: var(--rm-text);
+}
+
+.assign-row__dates {
+  color: var(--rm-text-muted);
+}
+
+.assign-row.is-closed {
+  opacity: 0.6;
+}
