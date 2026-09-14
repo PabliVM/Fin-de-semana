@@ -44,11 +44,8 @@ function renderPanelInforme(container) {
     '<div class="informe-subtabs">' +
       '<button class="rm-pill-button' + (state.informeView === 'calendario' ? ' is-active' : '') + '" data-view="calendario" type="button">Calendario general</button>' +
       '<button class="rm-pill-button' + (state.informeView === 'ficha' ? ' is-active' : '') + '" data-view="ficha" type="button">Ficha individual</button>' +
-      '<button class="rm-pill-button" id="btn-team-dates" type="button">📅 Fechas de inicio de equipos</button>' +
     '</div>' +
     '<div id="informe-body" style="margin-top:16px"></div>';
-
-  qs('#btn-team-dates', container).addEventListener('click', function () { openTeamDatesModal(); });
 
   qsa('[data-view]', container).forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -77,7 +74,7 @@ function renderCalendarioGeneral(body) {
       '<button class="rm-icon-button" id="informe-next" type="button">›</button>' +
     '</div>' +
     (techs.length && weekends.length
-      ? '<div class="rm-table-wrap"><table class="rm-table"><thead><tr>' +
+      ? '<div class="rm-table-wrap"><table class="rm-table informe-table"><thead><tr>' +
           '<th>Técnico</th>' +
           weekends.map(function (w) { return '<th>' + formatDate(w) + '</th>'; }).join('') +
         '</tr></thead><tbody>' +
