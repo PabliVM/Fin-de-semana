@@ -11,7 +11,7 @@ function initSightingsData() {
   if (isFirebaseUnconfigured()) return;
   _unsubSightings = listenCollection('sightings', function (rows) {
     setState({ sightings: rows, loaded: Object.assign({}, state.loaded, { sightings: true }) });
-    if (state.activeTab === 'inicio') renderPanelInicio(qs('.tab-panel[data-tab="inicio"]'));
+    if (state.activeTab === 'inicio') safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
   }, function (err) { showError('Error cargando visionados: ' + err.message); });
 }
 
@@ -32,7 +32,7 @@ function ensureInicioWeekend() {
 function shiftInicioWeek(delta) {
   ensureInicioWeekend();
   setState({ inicioWeekend: addDaysISO(state.inicioWeekend, delta * 7) });
-  renderPanelInicio(qs('.tab-panel[data-tab="inicio"]'));
+  safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
 }
 
 function teamOptionsFor(weekendDate, currentValue) {
