@@ -10,7 +10,14 @@
     });
   }
 
-  const storedTheme = localStorage.getItem(storageKey);
+  function safeGet() {
+    try { return localStorage.getItem(storageKey); } catch (e) { return null; }
+  }
+  function safeSet(value) {
+    try { localStorage.setItem(storageKey, value); } catch (e) { /* origen file:// u otro bloqueo */ }
+  }
+
+  const storedTheme = safeGet();
   applyTheme(storedTheme === "dark" ? "dark" : "light");
 
   document.addEventListener("click", (event) => {
@@ -18,7 +25,7 @@
     if (!button) return;
 
     const nextTheme = root.dataset.rmTheme === "dark" ? "light" : "dark";
-    localStorage.setItem(storageKey, nextTheme);
+    safeSet(nextTheme);
     applyTheme(nextTheme);
   });
 })();
