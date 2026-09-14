@@ -8,6 +8,16 @@ const PANEL_RENDERERS = {
   informe: renderPanelInforme,
 };
 
+function safeRender(renderFn, panel) {
+  try {
+    renderFn(panel);
+  } catch (err) {
+    console.error('[Render] Fallo en un panel:', err);
+    panel.innerHTML = '<div class="rm-card" style="border-color:var(--rm-danger)">' +
+      '<p class="rm-card__text">Error al cargar esta pantalla: ' + safeText(err.message) + '<br>Revisa la consola (F12) o que todos los archivos estén subidos.</p></div>';
+  }
+}
+
 function renderMain() {
   const main = document.getElementById('rm-main');
   main.innerHTML = '';
@@ -17,7 +27,7 @@ function renderMain() {
     panel.dataset.tab = tab.key;
     main.appendChild(panel);
     const render = PANEL_RENDERERS[tab.key];
-    if (render) render(panel);
+    if (render) safeRender(render, panel);
   });
 }
 
@@ -25,7 +35,7 @@ function setupEvents() {
   document.addEventListener('rm:tab-changed', function (e) {
     const panel = qs('.tab-panel[data-tab="' + e.detail + '"]');
     const render = PANEL_RENDERERS[e.detail];
-    if (panel && render) render(panel);
+    if (panel && render) safeRender(render, panel);
   });
 }
 
@@ -45,7 +55,6 @@ function boot() {
   if (firebaseReady) {
     initTechniciansData();
     initSightingsData();
-    initTeamDatesData();
   }
 }
 
