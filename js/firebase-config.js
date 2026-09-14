@@ -3,12 +3,12 @@
 // ================================================
 
 const firebaseConfig = {
-  apiKey: 'TU_API_KEY',
-  authDomain: 'TU_AUTH_DOMAIN',
-  projectId: 'TU_PROJECT_ID',
-  storageBucket: 'TU_STORAGE_BUCKET',
-  messagingSenderId: 'TU_MESSAGING_SENDER_ID',
-  appId: 'TU_APP_ID',
+  apiKey: 'AIzaSyD8zZti58e5vru0XuztfIYVdVilgva7D_A',
+  authDomain: 'fin-de-semana-ddfef.firebaseapp.com',
+  projectId: 'fin-de-semana-ddfef',
+  storageBucket: 'fin-de-semana-ddfef.firebasestorage.app',
+  messagingSenderId: '444157256737',
+  appId: '1:444157256737:web:030f276dd47ffe1c5fef60',
 };
 
 function isFirebaseUnconfigured() {
