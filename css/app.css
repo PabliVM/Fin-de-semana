@@ -30,7 +30,7 @@
 
 .sightings-table th:first-child,
 .sightings-table td:first-child {
-  width: 220px;
+  width: 200px;
   white-space: nowrap;
 }
 
@@ -38,24 +38,24 @@
 .sightings-table th:nth-child(3),
 .sightings-table td:nth-child(2),
 .sightings-table td:nth-child(3) {
-  width: 150px;
+  width: 100px;
 }
 
 .sightings-table td:nth-child(2) .rm-select,
 .sightings-table td:nth-child(3) .rm-select {
-  min-height: 36px;
-  padding: 8px 30px 8px 10px;
-  font-size: 13px;
+  min-height: 34px;
+  padding: 6px 24px 6px 8px;
+  font-size: 12px;
 }
 
 .sightings-table th:last-child,
 .sightings-table td:last-child {
-  width: 260px;
+  width: auto;
 }
 
 .sightings-table td:last-child .rm-input {
-  min-height: 36px;
-  padding: 8px 10px;
+  min-height: 34px;
+  padding: 6px 10px;
   font-size: 13px;
 }
 
