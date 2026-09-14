@@ -38,6 +38,13 @@ function addDocument(collectionName, data) {
   })).then(function (ref) { return ref.id; });
 }
 
+// Upsert con ID propio (p. ej. `${technicianId}_${weekendDate}`).
+function setDocument(collectionName, id, data) {
+  return getDB().collection(collectionName).doc(id).set(Object.assign({}, data, {
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }), { merge: true });
+}
+
 function updateDocument(collectionName, id, patch) {
   return getDB().collection(collectionName).doc(id).update(Object.assign({}, patch, {
     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
