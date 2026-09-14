@@ -10,7 +10,7 @@ const SEASON = { start: '2026-09-01', end: '2027-06-30', label: '2026/2027' };
 
 // Equipos Cantera, orden confirmado por Pablo.
 const TEAMS = [
-  { id: 'castilla', name: 'Castilla', short: 'CAST' },
+  { id: 'castilla', name: 'Castilla', short: 'CAS' },
   { id: 'rmc', name: 'RMC', short: 'RMC' },
   { id: 'juvenil-a', name: 'Juvenil A', short: 'JA' },
   { id: 'juvenil-b', name: 'Juvenil B', short: 'JB' },
@@ -37,4 +37,9 @@ const TABS = [
 
 function teamById(id) {
   return TEAMS.find((t) => t.id === id) || null;
+}
+
+function teamOrderIndex(id) {
+  const idx = TEAMS.findIndex((t) => t.id === id);
+  return idx === -1 ? TEAMS.length : idx;
 }
