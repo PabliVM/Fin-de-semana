@@ -65,10 +65,20 @@ function renderPanelInforme(container) {
   renderCalendarioGeneral(body);
 }
 
+function daysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
 function renderCalendarioGeneral(body) {
   const { year, month } = state.informeMonth;
-  const weekends = weekendsInMonth(year, month);
+  const totalDays = daysInMonth(year, month);
   const techs = sortedTechnicians().filter(function (t) { return t.active !== false; });
+
+  const days = [];
+  for (let d = 1; d <= totalDays; d++) {
+    const date = new Date(year, month, d);
+    days.push({ day: d, dow: date.getDay(), iso: toLocalISO(date) });
+  }
 
   body.innerHTML =
     '<div class="informe-month-nav">' +
@@ -76,24 +86,32 @@ function renderCalendarioGeneral(body) {
       '<span class="informe-month-label">' + MONTH_NAMES[month] + ' ' + year + '</span>' +
       '<button class="rm-icon-button" id="informe-next" type="button">›</button>' +
     '</div>' +
-    (techs.length && weekends.length
-      ? '<div class="rm-table-wrap"><table class="rm-table"><thead><tr>' +
+    (techs.length
+      ? '<div class="rm-table-wrap"><table class="rm-table calendario-table"><thead><tr>' +
           '<th>Técnico</th>' +
-          weekends.map(function (w) { return '<th>' + formatDate(w) + '</th>'; }).join('') +
+          days.map(function (d) { return '<th class="' + (isWeekendDow(d.dow) ? 'weekend-col' : '') + '">' + String(d.day).padStart(2, '0') + '</th>'; }).join('') +
         '</tr></thead><tbody>' +
-          techs.map(function (t) { return renderInformeRow(t, weekends); }).join('') +
+          techs.map(function (t) { return renderInformeRow(t, days); }).join('') +
         '</tbody></table></div>'
-      : '<div class="rm-card"><p class="rm-card__text">No hay técnicos activos o findes en este mes.</p></div>');
+      : '<div class="rm-card"><p class="rm-card__text">No hay técnicos activos.</p></div>');
 
   qs('#informe-prev', body).addEventListener('click', function () { shiftInformeMonth(-1); });
   qs('#informe-next', body).addEventListener('click', function () { shiftInformeMonth(1); });
 }
 
-function renderInformeRow(t, weekends) {
+function isWeekendDow(dow) {
+  return dow === 0 || dow === 6;
+}
+
+function renderInformeRow(t, days) {
   return (
     '<tr>' +
       '<td>' + safeText(t.initials) + '</td>' +
-      weekends.map(function (w) { return '<td>' + renderInformeCell(t.id, w) + '</td>'; }).join('') +
+      days.map(function (d) {
+        const cls = isWeekendDow(d.dow) ? 'weekend-col' : '';
+        const content = d.dow === 0 ? renderInformeCell(t.id, d.iso) : '';
+        return '<td class="' + cls + '">' + content + '</td>';
+      }).join('') +
     '</tr>'
   );
 }
