@@ -2,6 +2,32 @@
 
 .hidden { display: none !important; }
 
+.informe-subtabs {
+  display: flex;
+  gap: 8px;
+}
+
+.informe-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.informe-month-label {
+  min-width: 140px;
+  color: var(--rm-text);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.informe-cell {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
 .rm-toast {
   position: fixed;
   z-index: 300;
