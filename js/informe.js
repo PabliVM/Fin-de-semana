@@ -61,6 +61,26 @@ function renderPanelInforme(container) {
   renderCalendarioGeneral(body);
 }
 
+function lastSightingDateByTeam(technicianId) {
+  const lastByTeam = {};
+  state.sightings.forEach(function (s) {
+    if (s.technicianId !== technicianId) return;
+    [s.team1, s.team2].forEach(function (teamId) {
+      if (!teamId) return;
+      if (!lastByTeam[teamId] || s.weekendDate > lastByTeam[teamId]) lastByTeam[teamId] = s.weekendDate;
+    });
+  });
+  return lastByTeam;
+}
+
+function weeksSince(dateISO) {
+  const diffDays = Math.floor((new Date(todayISO() + 'T00:00:00') - new Date(dateISO + 'T00:00:00')) / 86400000);
+  const weeks = Math.floor(diffDays / 7);
+  if (weeks <= 0) return 'esta semana';
+  if (weeks === 1) return 'hace 1 semana';
+  return 'hace ' + weeks + ' semanas';
+}
+
 function sightingsCountByTeam(technicianId) {
   const counts = {};
   state.sightings.forEach(function (s) {
@@ -90,12 +110,14 @@ function renderFichaIndividual(body) {
     .filter(function (t) { return counts[t.id]; })
     .map(function (t) { return { team: t, count: counts[t.id], pct: totalVisionados ? Math.round(counts[t.id] / totalVisionados * 100) : 0 }; });
 
+  const lastByTeam = lastSightingDateByTeam(tech.id);
   const asignados = currentAssignmentsFor(tech.id)
     .slice()
     .sort(function (a, b) { return teamOrderIndex(a.teamId) - teamOrderIndex(b.teamId); })
     .map(function (a) {
       const count = counts[a.teamId] || 0;
-      return { team: teamById(a.teamId), count: count, pct: totalVisionados ? Math.round(count / totalVisionados * 100) : 0 };
+      const last = lastByTeam[a.teamId];
+      return { team: teamById(a.teamId), count: count, pct: totalVisionados ? Math.round(count / totalVisionados * 100) : 0, last: last };
     });
 
   body.innerHTML =
@@ -113,8 +135,9 @@ function renderFichaIndividual(body) {
     (asignados.length
       ? '<div class="assign-list" style="max-width:520px;margin-bottom:20px">' +
           asignados.map(function (a) {
+            const lastText = a.last ? formatDate(a.last) + ' (' + weeksSince(a.last) + ')' : 'nunca';
             return '<div class="assign-row"><span class="assign-row__team">' + safeText(a.team.name) + '</span>' +
-              '<span class="assign-row__dates">' + a.count + (a.count === 1 ? ' visionado' : ' visionados') + (totalVisionados ? ' · ' + a.pct + '%' : '') + '</span></div>';
+              '<span class="assign-row__dates">' + a.count + (a.count === 1 ? ' visionado' : ' visionados') + (totalVisionados ? ' · ' + a.pct + '%' : '') + ' · último: ' + lastText + '</span></div>';
           }).join('') +
         '</div>'
       : '<p class="rm-card__text" style="margin-bottom:20px">No tiene equipos asignados.</p>') +
