@@ -35,6 +35,15 @@ function shiftInicioWeek(delta) {
   renderPanelInicio(qs('.tab-panel[data-tab="inicio"]'));
 }
 
+function teamOptionsFor(weekendDate, currentValue) {
+  const started = TEAMS.filter(function (t) { return isTeamStartedByWeekend(t.id, weekendDate); });
+  const list = (currentValue && !started.some(function (t) { return t.id === currentValue; }))
+    ? started.concat(TEAMS.filter(function (t) { return t.id === currentValue; }))
+    : started;
+  return '<option value="">—</option>' +
+    list.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.short) + '</option>'; }).join('');
+}
+
 function renderPanelInicio(container) {
   if (!container) return;
   ensureInicioWeekend();
@@ -42,9 +51,6 @@ function renderPanelInicio(container) {
   const activeTechs = state.technicians
     .filter(function (t) { return t.active !== false; })
     .sort(function (a, b) { return (a.order || 0) - (b.order || 0) || (a.fullName || '').localeCompare(b.fullName || ''); });
-
-  const teamOptions = '<option value="">—</option>' +
-    TEAMS.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.name) + '</option>'; }).join('');
 
   container.innerHTML =
     (isFirebaseUnconfigured() ? '<div class="firebase-notice rm-card" style="margin-bottom:16px">⚠ Firebase pendiente de configurar — edita js/firebase-config.js</div>' : '') +
@@ -56,7 +62,7 @@ function renderPanelInicio(container) {
       '<span class="informe-month-label">Fin de semana del ' + formatDate(weekendDate) + '</span>' +
       '<button class="rm-icon-button" id="inicio-next" type="button">›</button>' +
     '</div>' +
-    (activeTechs.length ? renderSightingsTable(activeTechs, weekendDate, teamOptions)
+    (activeTechs.length ? renderSightingsTable(activeTechs, weekendDate)
       : '<div class="rm-card"><p class="rm-card__text">No hay técnicos activos. Da de alta técnicos en la pestaña Técnicos.</p></div>');
 
   qs('#inicio-prev', container).addEventListener('click', function () { shiftInicioWeek(-1); });
@@ -67,7 +73,7 @@ function renderPanelInicio(container) {
   });
 }
 
-function renderSightingsTable(techs, weekendDate, teamOptions) {
+function renderSightingsTable(techs, weekendDate) {
   return (
     '<div class="rm-table-wrap">' +
       '<table class="rm-table sightings-table">' +
@@ -86,9 +92,9 @@ function renderSightingsTable(techs, weekendDate, teamOptions) {
               '<tr>' +
                 '<td>' + safeText(t.initials) + ' — ' + safeText(t.fullName) + '</td>' +
                 '<td><select class="rm-select" data-technician="' + t.id + '" data-slot="team1">' +
-                  teamOptions.replace('value="' + v1 + '"', 'value="' + v1 + '" selected') + '</select></td>' +
+                  teamOptionsFor(weekendDate, v1).replace('value="' + v1 + '"', 'value="' + v1 + '" selected') + '</select></td>' +
                 '<td><select class="rm-select" data-technician="' + t.id + '" data-slot="team2">' +
-                  teamOptions.replace('value="' + v2 + '"', 'value="' + v2 + '" selected') + '</select></td>' +
+                  teamOptionsFor(weekendDate, v2).replace('value="' + v2 + '"', 'value="' + v2 + '" selected') + '</select></td>' +
                 '<td><input class="rm-input" type="text" data-technician="' + t.id + '" data-slot="notes" value="' + safeText(notes) + '" placeholder="—" /></td>' +
               '</tr>'
             );
