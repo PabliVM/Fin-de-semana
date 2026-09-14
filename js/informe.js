@@ -10,7 +10,7 @@ function weekendsInMonth(year, month) {
   const result = [];
   const d = new Date(year, month, 1);
   while (d.getMonth() === month) {
-    if (d.getDay() === 0) result.push(d.toISOString().slice(0, 10));
+    if (d.getDay() === 0) result.push(toLocalISO(d));
     d.setDate(d.getDate() + 1);
   }
   return result;
