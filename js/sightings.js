@@ -12,6 +12,7 @@ function initSightingsData() {
   _unsubSightings = listenCollection('sightings', function (rows) {
     setState({ sightings: rows, loaded: Object.assign({}, state.loaded, { sightings: true }) });
     if (state.activeTab === 'inicio') safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
+    if (state.activeTab === 'informe') safeRender(renderPanelInforme, qs('.tab-panel[data-tab="informe"]'));
   }, function (err) { showError('Error cargando visionados: ' + err.message); });
 }
 
