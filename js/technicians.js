@@ -69,6 +69,8 @@ function renderTechRow(t, isFirst, isLast) {
   const row = document.createElement('div');
   row.className = 'tech-row' + (t.active === false ? ' is-inactive' : '');
   const teams = currentAssignmentsFor(t.id)
+    .slice()
+    .sort(function (a, b) { return teamOrderIndex(a.teamId) - teamOrderIndex(b.teamId); })
     .map(function (a) { const team = teamById(a.teamId); return team ? team.name : a.teamId; })
     .join(' · ') || 'Sin equipos asignados';
 
