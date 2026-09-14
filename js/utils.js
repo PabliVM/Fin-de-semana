@@ -24,8 +24,21 @@ function formatDate(dateStr) {
   ].join('/');
 }
 
+function toLocalISO(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + d;
+}
+
+function addDaysISO(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return toLocalISO(d);
+}
+
 function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+  return toLocalISO(new Date());
 }
 
 // Domingo del finde en curso/próximo: el domingo más cercano >= hoy.
@@ -36,7 +49,7 @@ function nextWeekendDate(baseDateStr) {
   const daysUntilSunday = (7 - day) % 7;
   const sunday = new Date(base);
   sunday.setDate(base.getDate() + daysUntilSunday);
-  return sunday.toISOString().slice(0, 10);
+  return toLocalISO(sunday);
 }
 
 function uid() {
