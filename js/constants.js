@@ -2,9 +2,9 @@
 // CONSTANTS.JS — Constantes de la app Técnicos RM
 // ================================================
 
-const APP_NAME = 'Fin de Semana';
+const APP_NAME = 'Técnicos';
 const LOGO_PATH = './rm.png';
-const FOOTER_TEXT = 'Cantera del Real Madrid CF — Fin de Semana';
+const FOOTER_TEXT = 'Cantera del Real Madrid CF — Técnicos';
 
 const SEASON = { start: '2026-09-01', end: '2027-06-30', label: '2026/2027' };
 
@@ -21,6 +21,7 @@ const TEAMS = [
 ];
 
 const TABS = [
+  { key: 'inicio', label: 'Inicio' },
   { key: 'tecnicos', label: 'Técnicos' },
   { key: 'informe', label: 'Informe general' },
 ];
