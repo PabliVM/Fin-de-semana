@@ -1,0 +1,70 @@
+:root {
+  color-scheme: light;
+
+  /* Marca extraída de la app Selecciones */
+  --rm-brand-primary: #2563eb;
+  --rm-brand-primary-hover: #1d4ed8;
+  --rm-brand-primary-deep: #1e40af;
+  --rm-brand-gold: #c8a96e;
+  --rm-brand-gold-light: #e8d5a3;
+  --rm-brand-gold-dark: #a8894e;
+
+  /* Fondos y texto */
+  --rm-bg: #f0f2f5;
+  --rm-surface: #ffffff;
+  --rm-surface-alt: #fafbfc;
+  --rm-text: #1a1d23;
+  --rm-text-secondary: #5a6170;
+  --rm-text-muted: #8b919e;
+  --rm-border: #dfe1e6;
+  --rm-border-strong: #c4c9d4;
+  --rm-white: #ffffff;
+
+  /* Estados */
+  --rm-info: #2563eb;
+  --rm-success: #16a34a;
+  --rm-warning: #ea580c;
+  --rm-danger: #dc2626;
+
+  /* Tipografía */
+  --rm-font: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  --rm-font-size-body: 16px;
+  --rm-line-height: 1.45;
+
+  /* Forma */
+  --rm-radius-sm: 5px;
+  --rm-radius: 8px;
+  --rm-radius-lg: 12px;
+  --rm-radius-pill: 999px;
+
+  /* Elevación y movimiento */
+  --rm-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --rm-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --rm-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --rm-transition: 0.2s ease;
+
+  /* Espaciado */
+  --rm-space-1: 4px;
+  --rm-space-2: 8px;
+  --rm-space-3: 12px;
+  --rm-space-4: 16px;
+  --rm-space-5: 20px;
+  --rm-space-6: 24px;
+  --rm-space-8: 32px;
+}
+
+[data-rm-theme="dark"],
+body.rm-dark {
+  color-scheme: dark;
+  --rm-bg: #1a1d23;
+  --rm-surface: #23272f;
+  --rm-surface-alt: #2a2e36;
+  --rm-text: #e4e6ea;
+  --rm-text-secondary: #a0a5b0;
+  --rm-text-muted: #707580;
+  --rm-border: #3a3f4a;
+  --rm-border-strong: #505560;
+  --rm-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --rm-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --rm-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
