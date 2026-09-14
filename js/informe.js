@@ -35,7 +35,6 @@ function shiftInformeMonth(delta) {
 
 function renderPanelInforme(container) {
   if (!container) return;
-  ensureInformeMonth();
 
   container.innerHTML =
     '<div class="rm-view-heading" style="border:0;padding:0;margin-bottom:16px">' +
@@ -62,16 +61,26 @@ function renderPanelInforme(container) {
   renderCalendarioGeneral(body);
 }
 
+function weekendsInSeason() {
+  const result = [];
+  let d = new Date(SEASON.start + 'T00:00:00');
+  const end = new Date(SEASON.end + 'T00:00:00');
+  const daysUntilSunday = (7 - d.getDay()) % 7;
+  d.setDate(d.getDate() + daysUntilSunday);
+  while (d <= end) {
+    result.push(toLocalISO(d));
+    d.setDate(d.getDate() + 7);
+  }
+  return result;
+}
+
 function renderCalendarioGeneral(body) {
-  const { year, month } = state.informeMonth;
-  const weekends = weekendsInMonth(year, month);
+  const weekends = weekendsInSeason();
   const techs = sortedTechnicians().filter(function (t) { return t.active !== false; });
 
   body.innerHTML =
     '<div class="informe-month-nav">' +
-      '<button class="rm-icon-button" id="informe-prev" type="button">‹</button>' +
-      '<span class="informe-month-label">' + MONTH_NAMES[month] + ' ' + year + '</span>' +
-      '<button class="rm-icon-button" id="informe-next" type="button">›</button>' +
+      '<span class="informe-month-label">Temporada ' + SEASON.label + '</span>' +
     '</div>' +
     (techs.length && weekends.length
       ? '<div class="rm-table-wrap"><table class="rm-table informe-table"><thead><tr>' +
@@ -80,10 +89,7 @@ function renderCalendarioGeneral(body) {
         '</tr></thead><tbody>' +
           techs.map(function (t) { return renderInformeRow(t, weekends); }).join('') +
         '</tbody></table></div>'
-      : '<div class="rm-card"><p class="rm-card__text">No hay técnicos activos o findes en este mes.</p></div>');
-
-  qs('#informe-prev', body).addEventListener('click', function () { shiftInformeMonth(-1); });
-  qs('#informe-next', body).addEventListener('click', function () { shiftInformeMonth(1); });
+      : '<div class="rm-card"><p class="rm-card__text">No hay técnicos activos.</p></div>');
 }
 
 function renderInformeRow(t, weekends) {
