@@ -19,14 +19,14 @@ const TEAMS = [
   { id: 'cadete-b', name: 'Cadete B', short: 'CB' },
   { id: 'infantil-a', name: 'Infantil A', short: 'IA' },
   { id: 'infantil-b', name: 'Infantil B', short: 'IB' },
-  { id: 'alevin-a', name: 'Alevín A', short: 'ALA' },
-  { id: 'alevin-b', name: 'Alevín B', short: 'ALB' },
-  { id: 'alevin-c', name: 'Alevín C', short: 'ALC' },
-  { id: 'benjamin-a', name: 'Benjamín A', short: 'BJA' },
-  { id: 'benjamin-b', name: 'Benjamín B', short: 'BJB' },
-  { id: 'prebenjamin-a', name: 'Prebenjamín A', short: 'PBA' },
-  { id: 'prebenjamin-b', name: 'Prebenjamín B', short: 'PBB' },
-  { id: 'debutante', name: 'Debutante', short: 'DEB' },
+  { id: 'alevin-a', name: 'Alevín A', short: 'AA' },
+  { id: 'alevin-b', name: 'Alevín B', short: 'AB' },
+  { id: 'alevin-c', name: 'Alevín C', short: 'AC' },
+  { id: 'benjamin-a', name: 'Benjamín A', short: 'BA' },
+  { id: 'benjamin-b', name: 'Benjamín B', short: 'BB' },
+  { id: 'prebenjamin-a', name: 'Prebenjamín A', short: 'PA' },
+  { id: 'prebenjamin-b', name: 'Prebenjamín B', short: 'PB' },
+  { id: 'debutante', name: 'Debutante', short: 'DB' },
 ];
 
 const TABS = [
