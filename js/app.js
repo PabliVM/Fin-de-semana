@@ -15,6 +15,7 @@ function renderPanelInforme(container) {
 }
 
 const PANEL_RENDERERS = {
+  inicio: renderPanelInicio,
   tecnicos: renderPanelTecnicos,
   informe: renderPanelInforme,
 };
@@ -43,6 +44,7 @@ function setupEvents() {
 function boot() {
   initFirebase();
   initTechniciansData();
+  initSightingsData();
   renderHeader();
   renderTabs();
   renderFooter();
