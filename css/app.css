@@ -28,6 +28,42 @@
   flex-wrap: wrap;
 }
 
+.sightings-table th:first-child,
+.sightings-table td:first-child {
+  width: 220px;
+  white-space: nowrap;
+}
+
+.sightings-table th:nth-child(2),
+.sightings-table th:nth-child(3),
+.sightings-table td:nth-child(2),
+.sightings-table td:nth-child(3) {
+  width: 150px;
+}
+
+.sightings-table td:nth-child(2) .rm-select,
+.sightings-table td:nth-child(3) .rm-select {
+  min-height: 36px;
+  padding: 8px 30px 8px 10px;
+  font-size: 13px;
+}
+
+.sightings-table th:last-child,
+.sightings-table td:last-child {
+  width: 260px;
+}
+
+.sightings-table td:last-child .rm-input {
+  min-height: 36px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.sightings-table th,
+.sightings-table td {
+  padding: 8px 10px;
+}
+
 .rm-toast {
   position: fixed;
   z-index: 300;
