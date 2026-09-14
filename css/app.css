@@ -52,6 +52,25 @@
   background: var(--rm-surface);
 }
 
+.tech-row__order {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.tech-row__order .rm-icon-button {
+  width: 26px;
+  height: 20px;
+  border-radius: var(--rm-radius-sm);
+  font-size: 10px;
+}
+
+.tech-row__order .rm-icon-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .tech-row__avatar {
   display: flex;
   width: 40px;
