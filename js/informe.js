@@ -88,12 +88,15 @@ function renderFichaIndividual(body) {
 
   const seguimiento = TEAMS
     .filter(function (t) { return counts[t.id]; })
-    .map(function (t) { return { team: t, count: counts[t.id] }; });
+    .map(function (t) { return { team: t, count: counts[t.id], pct: totalVisionados ? Math.round(counts[t.id] / totalVisionados * 100) : 0 }; });
 
   const asignados = currentAssignmentsFor(tech.id)
     .slice()
     .sort(function (a, b) { return teamOrderIndex(a.teamId) - teamOrderIndex(b.teamId); })
-    .map(function (a) { return { team: teamById(a.teamId), count: counts[a.teamId] || 0 }; });
+    .map(function (a) {
+      const count = counts[a.teamId] || 0;
+      return { team: teamById(a.teamId), count: count, pct: totalVisionados ? Math.round(count / totalVisionados * 100) : 0 };
+    });
 
   body.innerHTML =
     '<div class="rm-field" style="max-width:320px;margin-bottom:16px">' +
@@ -102,25 +105,25 @@ function renderFichaIndividual(body) {
         techs.map(function (t) { return '<option value="' + t.id + '"' + (t.id === tech.id ? ' selected' : '') + '>' + safeText(t.fullName) + '</option>'; }).join('') +
       '</select>' +
     '</div>' +
-    '<div class="rm-card" style="margin-bottom:16px">' +
+    '<div class="rm-card" style="max-width:520px;margin-bottom:16px">' +
       '<h3 class="rm-card__title">' + safeText(tech.fullName) + ' (' + safeText(tech.initials) + ')</h3>' +
       '<p class="rm-card__text">Total de partidos vistos esta temporada: <strong>' + totalVisionados + '</strong></p>' +
     '</div>' +
     '<div class="rm-section-title">Sus equipos asignados</div>' +
     (asignados.length
-      ? '<div class="assign-list" style="margin-bottom:20px">' +
+      ? '<div class="assign-list" style="max-width:520px;margin-bottom:20px">' +
           asignados.map(function (a) {
             return '<div class="assign-row"><span class="assign-row__team">' + safeText(a.team.name) + '</span>' +
-              '<span class="assign-row__dates">' + a.count + (a.count === 1 ? ' visionado' : ' visionados') + '</span></div>';
+              '<span class="assign-row__dates">' + a.count + (a.count === 1 ? ' visionado' : ' visionados') + (totalVisionados ? ' · ' + a.pct + '%' : '') + '</span></div>';
           }).join('') +
         '</div>'
       : '<p class="rm-card__text" style="margin-bottom:20px">No tiene equipos asignados.</p>') +
     '<div class="rm-section-title">Seguimiento por equipo</div>' +
     (seguimiento.length
-      ? '<div class="assign-list">' +
+      ? '<div class="assign-list" style="max-width:520px">' +
           seguimiento.map(function (s) {
             return '<div class="assign-row"><span class="assign-row__team">' + safeText(s.team.name) + '</span>' +
-              '<span class="assign-row__dates">' + s.count + (s.count === 1 ? ' visionado' : ' visionados') + '</span></div>';
+              '<span class="assign-row__dates">' + s.count + (s.count === 1 ? ' visionado' : ' visionados') + ' · ' + s.pct + '%</span></div>';
           }).join('') +
         '</div>'
       : '<p class="rm-card__text">Todavía no ha visto ningún equipo esta temporada.</p>');
