@@ -11,6 +11,8 @@ const state = {
   informeView: 'calendario', // 'calendario' | 'ficha'
   informeMonth: null, // { year, month } — se inicializa en boot()
   inicioWeekend: null, // fecha ISO del domingo mostrado en Inicio — se inicializa al abrir la pestaña
+  teamDates: {}, // { [teamId]: 'YYYY-MM-DD' } fecha de inicio por equipo, configurable
+  fichaTechnicianId: null, // técnico seleccionado en Ficha individual
 };
 
 function setState(patch) {
