@@ -35,13 +35,9 @@ function shiftInicioWeek(delta) {
   safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
 }
 
-function teamOptionsFor(weekendDate, currentValue) {
-  const started = TEAMS.filter(function (t) { return isTeamStartedByWeekend(t.id, weekendDate); });
-  const list = (currentValue && !started.some(function (t) { return t.id === currentValue; }))
-    ? started.concat(TEAMS.filter(function (t) { return t.id === currentValue; }))
-    : started;
+function teamOptionsFor(currentValue) {
   return '<option value="">—</option>' +
-    list.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.short) + '</option>'; }).join('');
+    TEAMS.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.short) + '</option>'; }).join('');
 }
 
 function renderPanelInicio(container) {
@@ -92,9 +88,9 @@ function renderSightingsTable(techs, weekendDate) {
               '<tr>' +
                 '<td>' + safeText(t.initials) + ' — ' + safeText(t.fullName) + '</td>' +
                 '<td><select class="rm-select" data-technician="' + t.id + '" data-slot="team1">' +
-                  teamOptionsFor(weekendDate, v1).replace('value="' + v1 + '"', 'value="' + v1 + '" selected') + '</select></td>' +
+                  teamOptionsFor(v1).replace('value="' + v1 + '"', 'value="' + v1 + '" selected') + '</select></td>' +
                 '<td><select class="rm-select" data-technician="' + t.id + '" data-slot="team2">' +
-                  teamOptionsFor(weekendDate, v2).replace('value="' + v2 + '"', 'value="' + v2 + '" selected') + '</select></td>' +
+                  teamOptionsFor(v2).replace('value="' + v2 + '"', 'value="' + v2 + '" selected') + '</select></td>' +
                 '<td><input class="rm-input" type="text" data-technician="' + t.id + '" data-slot="notes" value="' + safeText(notes) + '" placeholder="—" /></td>' +
               '</tr>'
             );
