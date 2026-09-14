@@ -2,18 +2,6 @@
 // APP.JS — Punto de entrada
 // ================================================
 
-function renderPanelInforme(container) {
-  container.innerHTML =
-    '<div class="rm-view-heading" style="border:0;padding:0;margin-bottom:16px">' +
-      '<h1 class="rm-view-title">Informe general</h1>' +
-      '<span class="rm-view-subtitle">Pendiente — siguiente módulo</span>' +
-    '</div>' +
-    '<div class="rm-card"><p class="rm-card__text">' +
-    'Aquí irá la matriz técnicos × fines de semana con los visionados (secciones 2 a 12 del documento). ' +
-    'Necesita primero el registro de partidos/visionados.' +
-    '</p></div>';
-}
-
 const PANEL_RENDERERS = {
   inicio: renderPanelInicio,
   tecnicos: renderPanelTecnicos,
@@ -42,14 +30,17 @@ function setupEvents() {
 }
 
 function boot() {
-  initFirebase();
-  initTechniciansData();
-  initSightingsData();
   renderHeader();
   renderTabs();
   renderFooter();
   renderMain();
   setupEvents();
+
+  const firebaseReady = initFirebase();
+  if (firebaseReady) {
+    initTechniciansData();
+    initSightingsData();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', boot);
