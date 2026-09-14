@@ -8,16 +8,25 @@ const FOOTER_TEXT = 'Cantera del Real Madrid CF — Fin de Semana';
 
 const SEASON = { start: '2026-09-01', end: '2027-06-30', label: '2026/2027' };
 
-// ⚠ ASUNCIÓN: lista de equipos provisional tomada de los ejemplos del documento.
-// Confirmar lista real (IDs y nombres) antes de dar por cerrado el módulo.
+// Equipos Cantera, orden confirmado por Pablo.
 const TEAMS = [
+  { id: 'castilla', name: 'Castilla', short: 'CAST' },
+  { id: 'rmc', name: 'RMC', short: 'RMC' },
   { id: 'juvenil-a', name: 'Juvenil A', short: 'JA' },
   { id: 'juvenil-b', name: 'Juvenil B', short: 'JB' },
   { id: 'juvenil-c', name: 'Juvenil C', short: 'JC' },
   { id: 'cadete-a', name: 'Cadete A', short: 'CA' },
+  { id: 'cadete-b', name: 'Cadete B', short: 'CB' },
   { id: 'infantil-a', name: 'Infantil A', short: 'IA' },
-  { id: 'castilla', name: 'Castilla', short: 'CAST' },
-  { id: 'rmc', name: 'Real Madrid C', short: 'RMC' },
+  { id: 'infantil-b', name: 'Infantil B', short: 'IB' },
+  { id: 'alevin-a', name: 'Alevín A', short: 'ALA' },
+  { id: 'alevin-b', name: 'Alevín B', short: 'ALB' },
+  { id: 'alevin-c', name: 'Alevín C', short: 'ALC' },
+  { id: 'benjamin-a', name: 'Benjamín A', short: 'BJA' },
+  { id: 'benjamin-b', name: 'Benjamín B', short: 'BJB' },
+  { id: 'prebenjamin-a', name: 'Prebenjamín A', short: 'PBA' },
+  { id: 'prebenjamin-b', name: 'Prebenjamín B', short: 'PBB' },
+  { id: 'debutante', name: 'Debutante', short: 'DEB' },
 ];
 
 const TABS = [
