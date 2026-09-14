@@ -37,11 +37,15 @@ function historyAssignmentsFor(technicianId) {
 
 // ── RENDER LISTA ──────────────────────────────────
 
-function renderPanelTecnicos(container) {
-  if (!container) return;
-  const sorted = state.technicians.slice().sort(function (a, b) {
+function sortedTechnicians() {
+  return state.technicians.slice().sort(function (a, b) {
     return (a.order || 0) - (b.order || 0) || (a.fullName || '').localeCompare(b.fullName || '');
   });
+}
+
+function renderPanelTecnicos(container) {
+  if (!container) return;
+  const sorted = sortedTechnicians();
 
   container.innerHTML =
     (isFirebaseUnconfigured() ? '<div class="firebase-notice rm-card" style="margin-bottom:16px">⚠ Firebase pendiente de configurar — edita js/firebase-config.js</div>' : '') +
@@ -55,13 +59,13 @@ function renderPanelTecnicos(container) {
   if (!sorted.length) {
     list.innerHTML = '<div class="rm-card"><p class="rm-card__text">No hay técnicos todavía.</p></div>';
   } else {
-    sorted.forEach(function (t) { list.appendChild(renderTechRow(t)); });
+    sorted.forEach(function (t, i) { list.appendChild(renderTechRow(t, i === 0, i === sorted.length - 1)); });
   }
 
   qs('#btn-add-tech', container).addEventListener('click', function () { openTechModal(null); });
 }
 
-function renderTechRow(t) {
+function renderTechRow(t, isFirst, isLast) {
   const row = document.createElement('div');
   row.className = 'tech-row' + (t.active === false ? ' is-inactive' : '');
   const teams = currentAssignmentsFor(t.id)
@@ -69,6 +73,10 @@ function renderTechRow(t) {
     .join(' · ') || 'Sin equipos asignados';
 
   row.innerHTML =
+    '<div class="tech-row__order">' +
+      '<button class="rm-icon-button" data-action="move-up" type="button"' + (isFirst ? ' disabled' : '') + '>▲</button>' +
+      '<button class="rm-icon-button" data-action="move-down" type="button"' + (isLast ? ' disabled' : '') + '>▼</button>' +
+    '</div>' +
     '<div class="tech-row__avatar">' + safeText(t.initials || '??') + '</div>' +
     '<div class="tech-row__main">' +
       '<div class="tech-row__name">' + safeText(t.fullName) + (t.active === false ? ' <span class="rm-badge rm-badge--danger">Baja</span>' : '') + '</div>' +
@@ -79,7 +87,24 @@ function renderTechRow(t) {
     '</div>';
 
   qs('[data-action="edit"]', row).addEventListener('click', function () { openTechModal(t); });
+  qs('[data-action="move-up"]', row).addEventListener('click', function () { moveTechnician(t.id, -1); });
+  qs('[data-action="move-down"]', row).addEventListener('click', function () { moveTechnician(t.id, 1); });
   return row;
+}
+
+function moveTechnician(technicianId, direction) {
+  const sorted = sortedTechnicians();
+  const idx = sorted.findIndex(function (t) { return t.id === technicianId; });
+  const targetIdx = idx + direction;
+  if (idx === -1 || targetIdx < 0 || targetIdx >= sorted.length) return;
+
+  const reordered = sorted.slice();
+  const tmp = reordered[idx];
+  reordered[idx] = reordered[targetIdx];
+  reordered[targetIdx] = tmp;
+
+  Promise.all(reordered.map(function (t, i) { return updateDocument('technicians', t.id, { order: i }); }))
+    .catch(function (err) { showError(err.message); });
 }
 
 // ── MODAL FICHA TÉCNICO ───────────────────────────
@@ -94,12 +119,8 @@ function openTechModal(technician) {
       '<h2 class="rm-modal__title">' + (isEdit ? 'Editar técnico' : 'Nuevo técnico') + '</h2>' +
       '<div class="rm-field"><label class="rm-label">Nombre completo</label>' +
         '<input class="rm-input" id="f-name" value="' + safeText(technician ? technician.fullName : '') + '" placeholder="Nombre y apellidos" /></div>' +
-      '<div class="rm-grid">' +
-        '<div class="rm-field"><label class="rm-label">Iniciales</label>' +
-          '<input class="rm-input" id="f-initials" maxlength="4" value="' + safeText(technician ? technician.initials : '') + '" placeholder="JG" /></div>' +
-        '<div class="rm-field"><label class="rm-label">Orden</label>' +
-          '<input class="rm-input" id="f-order" type="number" value="' + (technician && technician.order != null ? technician.order : 0) + '" /></div>' +
-      '</div>' +
+      '<div class="rm-field"><label class="rm-label">Iniciales</label>' +
+        '<input class="rm-input" id="f-initials" maxlength="4" value="' + safeText(technician ? technician.initials : '') + '" placeholder="JG" /></div>' +
       '<div class="rm-grid">' +
         '<div class="rm-field"><label class="rm-label">Fecha de alta</label>' +
           '<input class="rm-input" id="f-start" type="date" value="' + (technician ? (technician.startDate || '') : todayISO()) + '" /></div>' +
@@ -149,7 +170,6 @@ function renderNewTechTeamsBlock() {
 function saveTechnicianFromModal(backdrop, technician) {
   const fullName = qs('#f-name', backdrop).value.trim();
   const initials = qs('#f-initials', backdrop).value.trim().toUpperCase();
-  const order = Number(qs('#f-order', backdrop).value) || 0;
   const startDate = qs('#f-start', backdrop).value || todayISO();
   const endDate = qs('#f-end', backdrop).value || null;
 
@@ -159,11 +179,11 @@ function saveTechnicianFromModal(backdrop, technician) {
   const data = {
     fullName: fullName,
     initials: initials,
-    order: order,
     startDate: startDate,
     endDate: endDate,
     active: !endDate,
   };
+  if (!technician) data.order = state.technicians.length; // nuevo técnico va al final
 
   const promise = technician
     ? updateDocument('technicians', technician.id, data)
