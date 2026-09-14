@@ -1,264 +1,61 @@
-/* Estilos específicos de Técnicos RM. No mezclar con components.css del kit. */
+// ================================================
+// APP.JS — Punto de entrada
+// ================================================
 
-.hidden { display: none !important; }
+const PANEL_RENDERERS = {
+  inicio: renderPanelInicio,
+  tecnicos: renderPanelTecnicos,
+  informe: renderPanelInforme,
+};
 
-.informe-subtabs {
-  display: flex;
-  gap: 8px;
+function safeRender(renderFn, panel) {
+  try {
+    renderFn(panel);
+  } catch (err) {
+    console.error('[Render] Fallo en un panel:', err);
+    panel.innerHTML = '<div class="rm-card" style="border-color:var(--rm-danger)">' +
+      '<p class="rm-card__text">Error al cargar esta pantalla: ' + safeText(err.message) + '<br>Revisa la consola (F12) o que todos los archivos estén subidos.</p></div>';
+  }
 }
 
-.informe-month-nav {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+function renderMain() {
+  const main = document.getElementById('rm-main');
+  main.innerHTML = '';
+  TABS.forEach(function (tab) {
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel' + (tab.key !== state.activeTab ? ' hidden' : '');
+    panel.dataset.tab = tab.key;
+    main.appendChild(panel);
+    const render = PANEL_RENDERERS[tab.key];
+    if (render) safeRender(render, panel);
+  });
 }
 
-.informe-month-label {
-  min-width: 140px;
-  color: var(--rm-text);
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
+function setupEvents() {
+  document.addEventListener('rm:tab-changed', function (e) {
+    const panel = qs('.tab-panel[data-tab="' + e.detail + '"]');
+    const render = PANEL_RENDERERS[e.detail];
+    if (panel && render) safeRender(render, panel);
+  });
 }
 
-.informe-cell {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  justify-content: center;
+function boot() {
+  const savedTab = safeStorageGet('rm-active-tab');
+  if (savedTab && TABS.some(function (t) { return t.key === savedTab; })) {
+    setState({ activeTab: savedTab });
+  }
+
+  renderHeader();
+  renderTabs();
+  renderFooter();
+  renderMain();
+  setupEvents();
+
+  const firebaseReady = initFirebase();
+  if (firebaseReady) {
+    initTechniciansData();
+    initSightingsData();
+  }
 }
 
-.informe-table th,
-.informe-table td {
-  width: 62px;
-  padding: 6px 3px;
-  border-left: 1px solid var(--rm-border);
-  text-align: center;
-  font-size: 11px;
-}
-
-.informe-table th:first-child,
-.informe-table td:first-child {
-  width: 55px;
-  border-left: 0;
-  text-align: center;
-  padding-left: 6px;
-  position: sticky;
-  left: 0;
-  z-index: 2;
-}
-
-.informe-table td:first-child {
-  background: var(--rm-brand-primary);
-  color: var(--rm-white);
-  font-weight: 700;
-}
-
-.informe-cell .rm-chip {
-  display: inline-flex;
-  width: 26px;
-  height: 26px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border-radius: var(--rm-radius-sm);
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.calendario-table th,
-.calendario-table td {
-  padding: 6px 4px;
-  min-width: 34px;
-  text-align: center;
-}
-
-.calendario-table th:first-child,
-.calendario-table td:first-child {
-  min-width: 60px;
-  text-align: left;
-  padding-left: 10px;
-}
-
-.calendario-table .weekend-col {
-  background: var(--rm-surface-alt);
-}
-
-.sightings-table th:first-child,
-.sightings-table td:first-child {
-  width: 200px;
-  white-space: nowrap;
-}
-
-.sightings-table th:nth-child(2),
-.sightings-table th:nth-child(3),
-.sightings-table td:nth-child(2),
-.sightings-table td:nth-child(3) {
-  width: 100px;
-}
-
-.sightings-table td:nth-child(2) .rm-select,
-.sightings-table td:nth-child(3) .rm-select {
-  min-height: 34px;
-  padding: 6px 24px 6px 8px;
-  font-size: 12px;
-}
-
-.sightings-table th:last-child,
-.sightings-table td:last-child {
-  width: auto;
-}
-
-.sightings-table td:last-child .rm-input {
-  min-height: 34px;
-  padding: 6px 10px;
-  font-size: 13px;
-}
-
-.sightings-table th,
-.sightings-table td {
-  padding: 8px 10px;
-}
-
-.rm-toast {
-  position: fixed;
-  z-index: 300;
-  bottom: 20px;
-  left: 50%;
-  padding: 12px 18px;
-  transform: translate(-50%, 20px);
-  border-radius: var(--rm-radius);
-  background: var(--rm-text);
-  color: var(--rm-white);
-  font-size: 13px;
-  font-weight: 600;
-  opacity: 0;
-  pointer-events: none;
-  transition: all var(--rm-transition);
-}
-
-.rm-toast.is-visible {
-  transform: translate(-50%, 0);
-  opacity: 1;
-}
-
-.rm-toast--error { background: var(--rm-danger); }
-.rm-toast--success { background: var(--rm-success); }
-
-.rm-app-tabs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 10px 24px;
-  border-bottom: 1px solid var(--rm-border);
-  background: var(--rm-surface);
-}
-
-.tech-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tech-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  border: 1px solid var(--rm-border);
-  border-radius: var(--rm-radius);
-  background: var(--rm-surface);
-}
-
-.tech-row__order {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 0 0 auto;
-}
-
-.tech-row__order .rm-icon-button {
-  width: 26px;
-  height: 20px;
-  border-radius: var(--rm-radius-sm);
-  font-size: 10px;
-}
-
-.tech-row__order .rm-icon-button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.tech-row__avatar {
-  display: flex;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--rm-brand-primary);
-  color: var(--rm-white);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.tech-row__main {
-  min-width: 0;
-  flex: 1;
-}
-
-.tech-row__name {
-  color: var(--rm-text);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.tech-row__teams {
-  margin-top: 4px;
-  color: var(--rm-text-secondary);
-  font-size: 12px;
-}
-
-.tech-row__actions {
-  display: flex;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.tech-row.is-inactive {
-  opacity: 0.55;
-}
-
-.assign-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.assign-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border: 1px solid var(--rm-border);
-  border-radius: var(--rm-radius-sm);
-  background: var(--rm-surface-alt);
-  font-size: 12px;
-}
-
-.assign-row__team {
-  flex: 1;
-  font-weight: 600;
-  color: var(--rm-text);
-}
-
-.assign-row__dates {
-  color: var(--rm-text-muted);
-}
-
-.assign-row.is-closed {
-  opacity: 0.6;
-}
+document.addEventListener('DOMContentLoaded', boot);
