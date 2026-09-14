@@ -43,6 +43,14 @@ function uid() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
+function safeStorageGet(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function safeStorageSet(key, value) {
+  try { localStorage.setItem(key, value); } catch (e) { /* bloqueado (file://, privacidad, etc.) */ }
+}
+
 let _toastTimer;
 function showToast(msg, type) {
   const toast = document.getElementById('rm-toast');
