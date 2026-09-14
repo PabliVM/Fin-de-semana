@@ -19,6 +19,7 @@ function renderTabs() {
 function switchTab(tabKey) {
   if (state.activeTab === tabKey) return;
   setState({ activeTab: tabKey });
+  safeStorageSet('rm-active-tab', tabKey);
   qsa('.rm-nav-button').forEach(function (btn) {
     btn.classList.toggle('is-active', btn.dataset.tab === tabKey);
   });
