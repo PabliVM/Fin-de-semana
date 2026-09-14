@@ -12,13 +12,13 @@ function initTechniciansData() {
   if (!isFirebaseUnconfigured()) {
     _unsubTech = listenCollection('technicians', function (rows) {
       setState({ technicians: rows, loaded: Object.assign({}, state.loaded, { technicians: true }) });
-      if (state.activeTab === 'tecnicos') renderPanelTecnicos(qs('.tab-panel[data-tab="tecnicos"]'));
-      if (state.activeTab === 'inicio') renderPanelInicio(qs('.tab-panel[data-tab="inicio"]'));
+      if (state.activeTab === 'tecnicos') safeRender(renderPanelTecnicos, qs('.tab-panel[data-tab="tecnicos"]'));
+      if (state.activeTab === 'inicio') safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
     }, function (err) { showError('Error cargando técnicos: ' + err.message); });
 
     _unsubAssign = listenCollection('technicianAssignments', function (rows) {
       setState({ assignments: rows, loaded: Object.assign({}, state.loaded, { assignments: true }) });
-      if (state.activeTab === 'tecnicos') renderPanelTecnicos(qs('.tab-panel[data-tab="tecnicos"]'));
+      if (state.activeTab === 'tecnicos') safeRender(renderPanelTecnicos, qs('.tab-panel[data-tab="tecnicos"]'));
     }, function (err) { showError('Error cargando asignaciones: ' + err.message); });
   }
 }
