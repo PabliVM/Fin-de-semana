@@ -37,6 +37,13 @@ function listenCollection(collectionName, onData, onError) {
   );
 }
 
+function listenDocument(collectionName, docId, onData, onError) {
+  return getDB().collection(collectionName).doc(docId).onSnapshot(
+    function (doc) { onData(doc.exists ? doc.data() : {}); },
+    function (err) { if (onError) onError(err); }
+  );
+}
+
 function addDocument(collectionName, data) {
   return getDB().collection(collectionName).add(Object.assign({}, data, {
     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
