@@ -106,7 +106,7 @@ function openTechModal(technician) {
         '<div class="rm-field"><label class="rm-label">Fecha de baja</label>' +
           '<input class="rm-input" id="f-end" type="date" value="' + (technician ? (technician.endDate || '') : '') + '" /></div>' +
       '</div>' +
-      (isEdit ? renderAssignmentsBlock(technician) : '<p class="rm-card__text">Guarda el técnico para poder asignarle equipos.</p>') +
+      (isEdit ? renderAssignmentsBlock(technician) : renderNewTechTeamsBlock()) +
       '<div class="rm-modal__actions">' +
         '<button class="rm-button rm-button--primary" id="modal-save" type="button">Guardar</button>' +
         (isEdit ? '<button class="rm-button rm-button--danger" id="modal-delete" type="button">Eliminar técnico</button>' : '') +
@@ -132,6 +132,20 @@ function openTechModal(technician) {
   }
 }
 
+function renderNewTechTeamsBlock() {
+  return (
+    '<div class="rm-section-title" style="margin-top:20px">Equipos asignados (opcional)</div>' +
+    '<p class="rm-card__text" style="margin-bottom:8px">No hace falta rellenarlo ahora, pero ayuda para el % de visionados por equipo.</p>' +
+    '<div class="rm-grid">' +
+      TEAMS.map(function (t) {
+        return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--rm-text)">' +
+          '<input type="checkbox" class="f-new-team" value="' + t.id + '" /> ' + safeText(t.name) +
+        '</label>';
+      }).join('') +
+    '</div>'
+  );
+}
+
 function saveTechnicianFromModal(backdrop, technician) {
   const fullName = qs('#f-name', backdrop).value.trim();
   const initials = qs('#f-initials', backdrop).value.trim().toUpperCase();
@@ -153,7 +167,14 @@ function saveTechnicianFromModal(backdrop, technician) {
 
   const promise = technician
     ? updateDocument('technicians', technician.id, data)
-    : addDocument('technicians', data);
+    : addDocument('technicians', data).then(function (newId) {
+        const checked = qsa('.f-new-team:checked', backdrop).map(function (cb) { return cb.value; });
+        return Promise.all(checked.map(function (teamId) {
+          return addDocument('technicianAssignments', {
+            technicianId: newId, teamId: teamId, startDate: startDate, endDate: null,
+          });
+        }));
+      });
 
   promise
     .then(function () { showSuccess('Técnico guardado.'); backdrop.remove(); })
