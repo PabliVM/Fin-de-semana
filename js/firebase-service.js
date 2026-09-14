@@ -8,11 +8,17 @@ function initFirebase() {
     console.warn('[Firebase] Credenciales sin configurar. Firestore desactivado.');
     return false;
   }
-  if (!window._fb) {
-    firebase.initializeApp(firebaseConfig);
-    window._fb = { db: firebase.firestore() };
+  try {
+    if (!window._fb) {
+      firebase.initializeApp(firebaseConfig);
+      window._fb = { db: firebase.firestore() };
+    }
+    return true;
+  } catch (err) {
+    console.error('[Firebase] No se pudo inicializar (¿SDK bloqueado o sin red?):', err);
+    showError('No se pudo conectar con Firebase. Revisa tu conexión.');
+    return false;
   }
-  return true;
 }
 
 function getDB() {
