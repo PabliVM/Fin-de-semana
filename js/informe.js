@@ -30,7 +30,7 @@ function shiftInformeMonth(delta) {
   if (month < 0) { month = 11; year -= 1; }
   if (month > 11) { month = 0; year += 1; }
   setState({ informeMonth: { year: year, month: month } });
-  renderPanelInforme(qs('.tab-panel[data-tab="informe"]'));
+  safeRender(renderPanelInforme, qs('.tab-panel[data-tab="informe"]'));
 }
 
 function renderPanelInforme(container) {
@@ -44,8 +44,11 @@ function renderPanelInforme(container) {
     '<div class="informe-subtabs">' +
       '<button class="rm-pill-button' + (state.informeView === 'calendario' ? ' is-active' : '') + '" data-view="calendario" type="button">Calendario general</button>' +
       '<button class="rm-pill-button' + (state.informeView === 'ficha' ? ' is-active' : '') + '" data-view="ficha" type="button">Ficha individual</button>' +
+      '<button class="rm-pill-button" id="btn-team-dates" type="button">📅 Fechas de inicio de equipos</button>' +
     '</div>' +
     '<div id="informe-body" style="margin-top:16px"></div>';
+
+  qs('#btn-team-dates', container).addEventListener('click', function () { openTeamDatesModal(); });
 
   qsa('[data-view]', container).forEach(function (btn) {
     btn.addEventListener('click', function () {
