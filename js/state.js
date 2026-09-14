@@ -3,10 +3,11 @@
 // ================================================
 
 const state = {
-  activeTab: 'tecnicos',
+  activeTab: 'inicio',
   technicians: [],
   assignments: [],
-  loaded: { technicians: false, assignments: false },
+  sightings: [],
+  loaded: { technicians: false, assignments: false, sightings: false },
 };
 
 function setState(patch) {
