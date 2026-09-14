@@ -26,6 +26,35 @@
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
+  justify-content: center;
+}
+
+.informe-table th,
+.informe-table td {
+  width: 100px;
+  padding: 8px 6px;
+  border-left: 1px solid var(--rm-border);
+  text-align: center;
+}
+
+.informe-table th:first-child,
+.informe-table td:first-child {
+  width: 70px;
+  border-left: 0;
+  text-align: left;
+  padding-left: 10px;
+}
+
+.informe-cell .rm-chip {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: var(--rm-radius-sm);
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .calendario-table th,
