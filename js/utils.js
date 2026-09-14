@@ -28,6 +28,17 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// Domingo del finde en curso/próximo: el domingo más cercano >= hoy.
+// Si hoy es lunes 14/09, devuelve el domingo 20/09 (mismo criterio que usa Pablo).
+function nextWeekendDate(baseDateStr) {
+  const base = baseDateStr ? new Date(baseDateStr + 'T00:00:00') : new Date();
+  const day = base.getDay(); // 0 = domingo
+  const daysUntilSunday = (7 - day) % 7;
+  const sunday = new Date(base);
+  sunday.setDate(base.getDate() + daysUntilSunday);
+  return sunday.toISOString().slice(0, 10);
+}
+
 function uid() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
