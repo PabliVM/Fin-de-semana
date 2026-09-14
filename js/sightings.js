@@ -25,9 +25,20 @@ function sightingFor(technicianId, weekendDate) {
   }) || null;
 }
 
+function ensureInicioWeekend() {
+  if (!state.inicioWeekend) setState({ inicioWeekend: nextWeekendDate() });
+}
+
+function shiftInicioWeek(delta) {
+  ensureInicioWeekend();
+  setState({ inicioWeekend: addDaysISO(state.inicioWeekend, delta * 7) });
+  renderPanelInicio(qs('.tab-panel[data-tab="inicio"]'));
+}
+
 function renderPanelInicio(container) {
   if (!container) return;
-  const weekendDate = nextWeekendDate();
+  ensureInicioWeekend();
+  const weekendDate = state.inicioWeekend;
   const activeTechs = state.technicians
     .filter(function (t) { return t.active !== false; })
     .sort(function (a, b) { return (a.order || 0) - (b.order || 0) || (a.fullName || '').localeCompare(b.fullName || ''); });
@@ -39,10 +50,17 @@ function renderPanelInicio(container) {
     (isFirebaseUnconfigured() ? '<div class="firebase-notice rm-card" style="margin-bottom:16px">⚠ Firebase pendiente de configurar — edita js/firebase-config.js</div>' : '') +
     '<div class="rm-view-heading" style="border:0;padding:0;margin-bottom:16px">' +
       '<h1 class="rm-view-title">Registro del finde</h1>' +
-      '<span class="rm-view-subtitle">Fin de semana del ' + formatDate(weekendDate) + '</span>' +
+    '</div>' +
+    '<div class="informe-month-nav">' +
+      '<button class="rm-icon-button" id="inicio-prev" type="button">‹</button>' +
+      '<span class="informe-month-label">Fin de semana del ' + formatDate(weekendDate) + '</span>' +
+      '<button class="rm-icon-button" id="inicio-next" type="button">›</button>' +
     '</div>' +
     (activeTechs.length ? renderSightingsTable(activeTechs, weekendDate, teamOptions)
       : '<div class="rm-card"><p class="rm-card__text">No hay técnicos activos. Da de alta técnicos en la pestaña Técnicos.</p></div>');
+
+  qs('#inicio-prev', container).addEventListener('click', function () { shiftInicioWeek(-1); });
+  qs('#inicio-next', container).addEventListener('click', function () { shiftInicioWeek(1); });
 
   qsa('select[data-technician][data-slot], input[data-technician][data-slot]', container).forEach(function (el) {
     el.addEventListener('change', function () { onSightingChange(el, weekendDate); });
