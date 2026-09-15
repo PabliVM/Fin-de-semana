@@ -2,6 +2,24 @@
 
 .hidden { display: none !important; }
 
+.season-select,
+.header-season-label {
+  flex: 0 0 auto;
+  margin-right: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--rm-radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--rm-white);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.season-select {
+  appearance: none;
+  cursor: pointer;
+}
+
 .informe-subtabs {
   display: flex;
   gap: 8px;
@@ -114,6 +132,38 @@
   min-height: 34px;
   padding: 6px 10px;
   font-size: 13px;
+}
+
+.sightings-row-off {
+  background: var(--rm-surface-alt);
+}
+
+.sightings-row-off td {
+  text-align: center;
+  color: var(--rm-text-muted);
+}
+
+.sightings-row-off td:first-child {
+  text-align: left;
+  color: var(--rm-text);
+}
+
+.friday-cell {
+  cursor: pointer;
+  font-weight: 700;
+  user-select: none;
+}
+
+.friday-cell--on {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--rm-success);
+}
+
+.friday-cell--blocked {
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--rm-danger);
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .sightings-table th,
