@@ -70,6 +70,16 @@ function renderPanelInicio(container) {
   });
 }
 
+function renderOffRow(t, off) {
+  return (
+    '<tr class="sightings-row-off">' +
+      '<td>' + safeText(t.initials) + ' — ' + safeText(t.fullName) + '</td>' +
+      '<td colspan="2"><span class="rm-badge rm-badge--warning">Librando' + (off.note ? ' · ' + safeText(off.note) : '') + '</span></td>' +
+      '<td>—</td>' +
+    '</tr>'
+  );
+}
+
 function renderSightingsTable(techs, weekendDate) {
   return (
     '<div class="rm-table-wrap">' +
@@ -81,6 +91,8 @@ function renderSightingsTable(techs, weekendDate) {
         '</tr></thead>' +
         '<tbody>' +
           techs.map(function (t) {
+            const off = timeOffFor(t.id, weekendDate);
+            if (off) return renderOffRow(t, off);
             const sighting = sightingFor(t.id, weekendDate);
             const v1 = sighting ? sighting.team1 || '' : '';
             const v2 = sighting ? sighting.team2 || '' : '';
