@@ -82,9 +82,11 @@ function weeksSince(dateISO) {
 }
 
 function sightingsCountByTeam(technicianId) {
+  const season = seasonById(state.selectedSeasonId);
   const counts = {};
   state.sightings.forEach(function (s) {
     if (s.technicianId !== technicianId) return;
+    if (s.weekendDate < season.start || s.weekendDate > season.end) return;
     [s.team1, s.team2].forEach(function (teamId) {
       if (!teamId) return;
       counts[teamId] = (counts[teamId] || 0) + 1;
@@ -158,9 +160,10 @@ function renderFichaIndividual(body) {
 }
 
 function weekendsInSeason() {
+  const season = seasonById(state.selectedSeasonId);
   const result = [];
-  let d = new Date(SEASON.start + 'T00:00:00');
-  const end = new Date(SEASON.end + 'T00:00:00');
+  let d = new Date(season.start + 'T00:00:00');
+  const end = new Date(season.end + 'T00:00:00');
   const daysUntilSunday = (7 - d.getDay()) % 7;
   d.setDate(d.getDate() + daysUntilSunday);
   while (d <= end) {
@@ -176,7 +179,7 @@ function renderCalendarioGeneral(body) {
 
   body.innerHTML =
     '<div class="informe-month-nav">' +
-      '<span class="informe-month-label">Temporada ' + SEASON.label + '</span>' +
+      '<span class="informe-month-label">Temporada ' + safeText(seasonById(state.selectedSeasonId).label) + '</span>' +
     '</div>' +
     (techs.length && weekends.length
       ? '<div class="rm-table-wrap"><table class="rm-table informe-table"><thead><tr>' +
