@@ -5,6 +5,8 @@
 const PANEL_RENDERERS = {
   inicio: renderPanelInicio,
   tecnicos: renderPanelTecnicos,
+  libranzas: renderPanelLibranzas,
+  viernes: renderPanelViernes,
   informe: renderPanelInforme,
 };
 
@@ -55,6 +57,8 @@ function boot() {
   if (firebaseReady) {
     initTechniciansData();
     initSightingsData();
+    initTimeOffData();
+    initFridayShiftsData();
   }
 }
 
