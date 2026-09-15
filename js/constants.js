@@ -6,7 +6,14 @@ const APP_NAME = 'Fin de Semana';
 const LOGO_PATH = './rm.png';
 const FOOTER_TEXT = 'Cantera del Real Madrid CF — Fin de Semana';
 
-const SEASON = { start: '2026-09-01', end: '2027-06-30', label: '2026/2027' };
+// Para añadir una temporada nueva, añade otro objeto aquí (id único).
+const SEASONS = [
+  { id: '2026-2027', start: '2026-09-01', end: '2027-06-30', label: '2026/2027' },
+];
+
+function seasonById(id) {
+  return SEASONS.find((s) => s.id === id) || SEASONS[0];
+}
 
 // Equipos Cantera, orden confirmado por Pablo.
 const TEAMS = [
@@ -32,6 +39,8 @@ const TEAMS = [
 const TABS = [
   { key: 'inicio', label: 'Inicio' },
   { key: 'tecnicos', label: 'Técnicos' },
+  { key: 'libranzas', label: 'Libranzas' },
+  { key: 'viernes', label: 'Turno viernes tarde' },
   { key: 'informe', label: 'Informe general' },
 ];
 
