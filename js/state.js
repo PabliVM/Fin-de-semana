@@ -9,6 +9,7 @@ const state = {
   sightings: [],
   timeOffRequests: [],
   fridayShifts: [],
+  matches: [],
   loaded: { technicians: false, assignments: false, sightings: false },
   informeView: 'calendario', // 'calendario' | 'ficha'
   informeMonth: null, // { year, month } — se inicializa en boot()
