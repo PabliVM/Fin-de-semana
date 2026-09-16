@@ -100,7 +100,7 @@ function renderMatchListRow(m, showTeamCol) {
       (showTeamCol ? '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(team ? team.short : m.teamId) + '</td>' : '') +
       '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(m.rival || '—') + '</td>' +
       '<td class="match-list-lv" data-action="edit-match" data-id="' + m.id + '">' + (m.homeAway === 'visitante' ? 'V' : 'L') + '</td>' +
-      '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(matchTypeLabel(m.type)) + (m.jornada ? ' J' + m.jornada : '') + '</td>' +
+      '<td data-action="edit-match" data-id="' + m.id + '"><span class="match-type-chip match-type-chip--' + safeText(m.postponed && m.type === 'liga' ? 'liga-postponed' : (m.type || 'liga')) + '">' + safeText(matchTypeLabel(m.type)) + (m.jornada ? ' J' + m.jornada : '') + (m.postponed ? ' ⏱' : '') + '</span></td>' +
       '<td data-action="edit-match" data-id="' + m.id + '">' + (techs || '<em>—</em>') + '</td>' +
       '<td class="match-list-row__actions">' +
         '<button class="rm-icon-button" data-action="edit-match" data-id="' + m.id + '" title="Editar">✏️</button>' +
@@ -171,20 +171,31 @@ function openMatchModal(match) {
 
   qs('#modal-save', backdrop).addEventListener('click', function () {
     const technicianIds = qsa('.m-tech:checked', backdrop).map(function (cb) { return cb.value; });
+    const newDate = qs('#m-date', backdrop).value;
+    const newType = qs('#m-type', backdrop).value;
 
-    if (!qs('#m-date', backdrop).value) { showError('La fecha es obligatoria.'); return; }
+    if (!newDate) { showError('La fecha es obligatoria.'); return; }
     if (!qs('#m-team', backdrop).value) { showError('Elige un equipo.'); return; }
     if (technicianIds.length > 4) { showError('Máximo 4 técnicos por partido.'); return; }
 
+    let postponed = match ? !!match.postponed : false;
+    if (match && match.date !== newDate) {
+      const diffDays = Math.abs((new Date(newDate + 'T00:00:00') - new Date(match.date + 'T00:00:00')) / 86400000);
+      if (diffDays > 1 && newType === 'liga') {
+        postponed = confirm('El partido cambia de fecha más de un día. ¿Es un aplazamiento?');
+      }
+    }
+
     const data = {
-      date: qs('#m-date', backdrop).value,
+      date: newDate,
       time: qs('#m-time', backdrop).value || null,
       teamId: qs('#m-team', backdrop).value,
       rival: qs('#m-rival', backdrop).value.trim(),
       homeAway: qs('#m-homeaway', backdrop).value,
-      type: qs('#m-type', backdrop).value,
+      type: newType,
       jornada: qs('#m-jornada', backdrop).value ? parseInt(qs('#m-jornada', backdrop).value, 10) : null,
       technicianIds: technicianIds,
+      postponed: postponed,
     };
 
     const promise = match ? updateDocument('matches', match.id, data) : addDocument('matches', data);
