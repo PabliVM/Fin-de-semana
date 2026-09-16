@@ -17,42 +17,50 @@ function initMatchesData() {
   }, function (err) { showError('Error cargando partidos: ' + err.message); });
 }
 
-function sortedMatchesList(teamFilter) {
+function sortedMatchesList(teamIds) {
   return state.matches
-    .filter(function (m) { return !teamFilter || m.teamId === teamFilter; })
+    .filter(function (m) { return !teamIds.length || teamIds.indexOf(m.teamId) !== -1; })
     .slice()
     .sort(function (a, b) { return (a.date + (a.time || '00:00')).localeCompare(b.date + (b.time || '00:00')); });
 }
 
+function toggleCalendarioTeam(teamId) {
+  const current = state.calendarioEquiposTeams.slice();
+  if (teamId === '') { setState({ calendarioEquiposTeams: [] }); return; }
+  const idx = current.indexOf(teamId);
+  if (idx === -1) current.push(teamId); else current.splice(idx, 1);
+  setState({ calendarioEquiposTeams: current });
+}
+
 function renderPanelCalendarioEquipos(container) {
   if (!container) return;
-  const teamFilter = state.calendarioEquiposTeam;
-  const matches = sortedMatchesList(teamFilter);
+  const teamIds = state.calendarioEquiposTeams;
+  const matches = sortedMatchesList(teamIds);
+  const showTeamCol = teamIds.length !== 1;
 
   container.innerHTML =
     (isFirebaseUnconfigured() ? '<div class="firebase-notice rm-card" style="margin-bottom:16px">⚠ Firebase pendiente de configurar — edita js/firebase-config.js</div>' : '') +
-    '<div class="rm-view-heading" style="display:flex;align-items:center;justify-content:space-between;border:0;padding:0;margin-bottom:16px;flex-wrap:wrap;gap:10px">' +
+    '<div class="rm-view-heading" style="display:flex;align-items:center;justify-content:space-between;border:0;padding:0;margin-bottom:12px;flex-wrap:wrap;gap:10px">' +
       '<div><h1 class="rm-view-title">Calendario equipos</h1><span class="rm-view-subtitle">' + matches.length + ' partidos</span></div>' +
-      '<div style="display:flex;gap:8px;align-items:center">' +
-        '<select class="rm-select" id="cal-team-filter" style="min-height:36px;width:190px">' +
-          '<option value="">Todos los equipos</option>' +
-          TEAMS.map(function (t) { return '<option value="' + t.id + '"' + (t.id === teamFilter ? ' selected' : '') + '>' + safeText(t.short) + '</option>'; }).join('') +
-        '</select>' +
+      '<div style="display:flex;gap:8px">' +
         '<button class="rm-button rm-button--ghost rm-button--small" id="btn-import-matches" type="button">📋 Carga por lista</button>' +
         '<button class="rm-button rm-button--primary rm-button--small" id="btn-add-match" type="button">+ Nuevo partido</button>' +
       '</div>' +
     '</div>' +
+    '<div class="team-tabs">' +
+      '<button class="rm-pill-button' + (!teamIds.length ? ' is-active' : '') + '" data-team="">Todos</button>' +
+      TEAMS.map(function (t) { return '<button class="rm-pill-button' + (teamIds.indexOf(t.id) !== -1 ? ' is-active' : '') + '" data-team="' + t.id + '">' + safeText(t.short) + '</button>'; }).join('') +
+    '</div>' +
     (matches.length
       ? '<div class="rm-table-wrap"><table class="rm-table match-list-table"><thead><tr>' +
-          '<th>Fecha</th>' + (teamFilter ? '' : '<th>Equipo</th>') + '<th>Rival</th><th>L/V</th><th>Tipo</th><th>Técnicos</th>' +
+          '<th>Fecha</th>' + (showTeamCol ? '<th>Equipo</th>' : '') + '<th>Rival</th><th>L/V</th><th>Tipo</th><th>Técnicos</th><th></th>' +
         '</tr></thead><tbody>' +
-          matches.map(function (m) { return renderMatchListRow(m, teamFilter); }).join('') +
+          matches.map(function (m) { return renderMatchListRow(m, showTeamCol); }).join('') +
         '</tbody></table></div>'
       : '<div class="rm-card"><p class="rm-card__text">No hay partidos cargados todavía.</p></div>');
 
-  qs('#cal-team-filter', container).addEventListener('change', function (e) {
-    setState({ calendarioEquiposTeam: e.target.value });
-    renderPanelCalendarioEquipos(container);
+  qsa('.team-tabs [data-team]', container).forEach(function (btn) {
+    btn.addEventListener('click', function () { toggleCalendarioTeam(btn.dataset.team); renderPanelCalendarioEquipos(container); });
   });
   qs('#btn-add-match', container).addEventListener('click', function () { openMatchModal(null); });
   qs('#btn-import-matches', container).addEventListener('click', function () { openImportModal(); });
@@ -62,22 +70,33 @@ function renderPanelCalendarioEquipos(container) {
       if (match) openMatchModal(match);
     });
   });
+  qsa('[data-action="delete-match"]', container).forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!confirm('¿Eliminar este partido?')) return;
+      deleteDocument('matches', btn.dataset.id).catch(function (err) { showError(err.message); });
+    });
+  });
 }
 
-function renderMatchListRow(m, teamFilter) {
+function renderMatchListRow(m, showTeamCol) {
   const team = teamById(m.teamId);
   const techs = (m.technicianIds || [])
     .map(function (id) { const t = state.technicians.find(function (x) { return x.id === id; }); return t ? t.initials : null; })
     .filter(Boolean)
     .join(', ');
   return (
-    '<tr class="match-list-row" data-action="edit-match" data-id="' + m.id + '">' +
-      '<td>' + safeText(formatDate(m.date)) + (m.time ? ' ' + safeText(m.time) : '') + '</td>' +
-      (teamFilter ? '' : '<td>' + safeText(team ? team.short : m.teamId) + '</td>') +
-      '<td>' + safeText(m.rival || '—') + '</td>' +
-      '<td>' + (m.homeAway === 'visitante' ? '@' : 'vs') + '</td>' +
-      '<td>' + safeText(matchTypeLabel(m.type)) + (m.jornada ? ' J' + m.jornada : '') + '</td>' +
-      '<td>' + (techs || '<em>—</em>') + '</td>' +
+    '<tr class="match-list-row">' +
+      '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(formatDate(m.date)) + (m.time ? ' ' + safeText(m.time) : '') + '</td>' +
+      (showTeamCol ? '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(team ? team.short : m.teamId) + '</td>' : '') +
+      '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(m.rival || '—') + '</td>' +
+      '<td data-action="edit-match" data-id="' + m.id + '">' + (m.homeAway === 'visitante' ? '@' : 'vs') + '</td>' +
+      '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(matchTypeLabel(m.type)) + (m.jornada ? ' J' + m.jornada : '') + '</td>' +
+      '<td data-action="edit-match" data-id="' + m.id + '">' + (techs || '<em>—</em>') + '</td>' +
+      '<td class="match-list-row__actions">' +
+        '<button class="rm-icon-button" data-action="edit-match" data-id="' + m.id + '" title="Editar">✏️</button>' +
+        '<button class="rm-icon-button" data-action="delete-match" data-id="' + m.id + '" title="Eliminar">✕</button>' +
+      '</td>' +
     '</tr>'
   );
 }
