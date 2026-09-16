@@ -97,7 +97,7 @@ function renderMatrixCell(teamId, dayISO) {
       .map(function (id) { const t = state.technicians.find(function (x) { return x.id === id; }); return t ? t.initials : '?'; })
       .join(', ');
     const title = (m.time || '') + ' ' + (m.homeAway === 'visitante' ? '@' : 'vs') + ' ' + (m.rival || '?') +
-      ' [' + matchTypeLabel(m.type) + ']' + (techs ? ' — Técnicos: ' + techs : ' — sin técnico');
+      ' [' + matchTypeLabel(m.type) + (m.jornada ? ' J' + m.jornada : '') + ']' + (techs ? ' — Técnicos: ' + techs : ' — sin técnico');
     return '<span class="match-dot match-dot--' + safeText(m.type || 'liga') + '" data-match-id="' + m.id + '" title="' + safeText(title) + '"></span>';
   }).join('');
 
