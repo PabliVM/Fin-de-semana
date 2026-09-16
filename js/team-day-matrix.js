@@ -41,6 +41,10 @@ function matchesForCell(teamId, dayISO) {
 
 function renderPanelInicio(container) {
   if (!container) return;
+  const prevWrap = qs('.matrix-wrap', container);
+  const scrollLeft = prevWrap ? prevWrap.scrollLeft : 0;
+  const scrollTop = prevWrap ? prevWrap.scrollTop : 0;
+
   const days = matrixDayRange();
   const monthGroups = matrixMonthGroups(days);
   const techs = state.technicians;
@@ -66,6 +70,9 @@ function renderPanelInicio(container) {
         TEAMS.map(function (team) { return renderMatrixRow(team, days); }).join('') +
       '</tbody>' +
     '</table></div>';
+
+  const newWrap = qs('.matrix-wrap', container);
+  if (newWrap) { newWrap.scrollLeft = scrollLeft; newWrap.scrollTop = scrollTop; }
 
   qsa('.match-tech-grid', container).forEach(function (grid) {
     grid.addEventListener('click', function () {
