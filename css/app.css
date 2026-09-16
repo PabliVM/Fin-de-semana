@@ -166,6 +166,102 @@
   opacity: 0.7;
 }
 
+.matrix-wrap {
+  max-height: 80vh;
+}
+
+.matrix-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.matrix-table th,
+.matrix-table td {
+  width: 26px;
+  min-width: 26px;
+  max-width: 26px;
+  padding: 2px 0;
+  border-left: 1px solid var(--rm-border);
+  text-align: center;
+  font-size: 9px;
+}
+
+.matrix-corner,
+.matrix-team {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  width: 46px;
+  min-width: 46px;
+  max-width: 46px;
+  border-left: 0;
+}
+
+.matrix-corner {
+  z-index: 4;
+  background: var(--rm-brand-primary);
+  color: var(--rm-white);
+}
+
+.matrix-team {
+  background: var(--rm-brand-primary);
+  color: var(--rm-white);
+  font-weight: 700;
+  font-size: 10px;
+}
+
+.matrix-month {
+  position: sticky;
+  top: 0;
+  background: var(--rm-brand-primary-deep);
+  color: var(--rm-white);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.matrix-day {
+  background: var(--rm-brand-primary);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+.matrix-day--weekend {
+  background: var(--rm-brand-primary-deep);
+}
+
+.matrix-cell--weekend {
+  background: var(--rm-surface-alt);
+}
+
+.matrix-cell__dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.match-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.match-dot--liga { background: var(--rm-brand-primary); }
+.match-dot--amistoso { background: var(--rm-text-muted); }
+.match-dot--torneo { background: var(--rm-brand-gold); }
+
+.import-row--warn {
+  background: rgba(234, 88, 12, 0.06);
+}
+
+.import-row__issues {
+  font-size: 11px;
+  color: var(--rm-warning);
+  max-width: 200px;
+}
+
 .match-day {
   margin-bottom: 20px;
 }
