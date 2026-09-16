@@ -281,11 +281,19 @@
   background: var(--rm-surface-alt);
 }
 
+.match-list-table {
+  table-layout: auto;
+}
+
 .match-list-table td,
 .match-list-table th {
-  padding: 5px 8px;
+  padding: 4px 6px;
   font-size: 11px;
+  white-space: nowrap;
 }
+
+.match-list-table td:nth-child(1) { width: 90px; }
+.match-list-lv { width: 28px; text-align: center; font-weight: 700; }
 
 .match-list-row__actions {
   display: flex;
