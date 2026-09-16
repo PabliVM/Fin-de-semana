@@ -166,6 +166,64 @@
   opacity: 0.7;
 }
 
+.match-day {
+  margin-bottom: 20px;
+}
+
+.match-day__label {
+  margin-bottom: 8px;
+  color: var(--rm-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.match-day__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match-card {
+  cursor: pointer;
+  transition: border-color var(--rm-transition);
+}
+
+.match-card:hover {
+  border-color: var(--rm-brand-primary);
+}
+
+.match-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.match-card__time {
+  color: var(--rm-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.match-card__teams {
+  color: var(--rm-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.match-card__vs {
+  color: var(--rm-text-muted);
+  font-weight: 500;
+}
+
+.match-card__tech {
+  margin-top: 4px;
+  color: var(--rm-text-secondary);
+  font-size: 12px;
+}
+
 .sightings-table th,
 .sightings-table td {
   padding: 8px 10px;
