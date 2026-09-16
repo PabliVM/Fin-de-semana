@@ -53,9 +53,15 @@ function renderPanelInicio(container) {
 
   container.innerHTML =
     (isFirebaseUnconfigured() ? '<div class="firebase-notice rm-card" style="margin-bottom:16px">⚠ Firebase pendiente de configurar — edita js/firebase-config.js</div>' : '') +
-    '<div class="rm-view-heading" style="border:0;padding:0;margin-bottom:16px">' +
-      '<h1 class="rm-view-title">Calendario general de equipos</h1>' +
-      '<span class="rm-view-subtitle">Los partidos se crean en "Calendario equipos" — aquí solo se consultan y editan</span>' +
+    '<div class="rm-view-heading" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;border:0;padding:0;margin-bottom:16px">' +
+      '<div><h1 class="rm-view-title">Calendario general de equipos</h1>' +
+        '<span class="rm-view-subtitle">Los partidos se crean en "Calendario equipos" — aquí solo se consultan y editan</span></div>' +
+      '<div class="match-type-legend">' +
+        '<span class="match-type-legend__item"><span class="match-type-legend__dot match-type-legend__dot--liga"></span>Liga</span>' +
+        '<span class="match-type-legend__item"><span class="match-type-legend__dot match-type-legend__dot--amistoso"></span>Amistoso</span>' +
+        '<span class="match-type-legend__item"><span class="match-type-legend__dot match-type-legend__dot--torneo"></span>Torneo</span>' +
+        '<span class="match-type-legend__item"><span class="match-type-legend__dot match-type-legend__dot--liga-postponed"></span>Liga aplazada</span>' +
+      '</div>' +
     '</div>' +
     '<div class="rm-table-wrap matrix-wrap"><table class="rm-table matrix-table">' +
       '<colgroup><col class="matrix-col-team" />' + days.map(function () { return '<col class="matrix-col-day" />'; }).join('') + '</colgroup>' +
@@ -127,12 +133,13 @@ function renderMatrixCell(teamId, dayISO) {
     const initials = (m.technicianIds || [])
       .map(function (id) { const t = state.technicians.find(function (x) { return x.id === id; }); return t ? t.initials : '?'; });
     const techsText = initials.join(', ');
+    const gridType = (m.postponed && m.type === 'liga') ? 'liga-postponed' : (m.type || 'liga');
     const title = (m.time || '') + ' ' + (m.homeAway === 'visitante' ? '@' : 'vs') + ' ' + (m.rival || '?') +
-      ' [' + matchTypeLabel(m.type) + (m.jornada ? ' J' + m.jornada : '') + ']' + (techsText ? ' — Técnicos: ' + techsText : ' — sin técnico');
+      ' [' + matchTypeLabel(m.type) + (m.jornada ? ' J' + m.jornada : '') + (m.postponed ? ' · APLAZADO' : '') + ']' + (techsText ? ' — Técnicos: ' + techsText : ' — sin técnico');
     const cells = initials.length
       ? initials.map(function (i) { return '<span class="match-tech-cell">' + safeText(i) + '</span>'; }).join('')
       : '<span class="match-tech-cell match-tech-cell--empty">·</span>';
-    const grid = '<div class="match-tech-grid match-tech-grid--' + safeText(m.type || 'liga') + '" data-match-id="' + m.id + '" title="' + safeText(title) + '">' + cells + '</div>';
+    const grid = '<div class="match-tech-grid match-tech-grid--' + safeText(gridType) + '" data-match-id="' + m.id + '" title="' + safeText(title) + '">' + cells + '</div>';
     const addSelect = renderMatrixTechAdd(m);
     return '<div class="matrix-match-block">' + grid + addSelect + '</div>';
   }).join('');
