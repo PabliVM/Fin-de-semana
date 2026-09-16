@@ -72,6 +72,19 @@ function renderPanelInicio(container) {
       if (match) openMatchModal(match);
     });
   });
+
+  qsa('.matrix-tech-add', container).forEach(function (select) {
+    select.addEventListener('change', function () {
+      const technicianId = select.value;
+      if (!technicianId) return;
+      const match = state.matches.find(function (m) { return m.id === select.dataset.matchId; });
+      if (!match) return;
+      const updated = (match.technicianIds || []).concat([technicianId]);
+      updateDocument('matches', match.id, { technicianIds: updated })
+        .then(function () { showSuccess('Técnico añadido.'); })
+        .catch(function (err) { showError(err.message); });
+    });
+  });
 }
 
 function isWeekendDay(dayISO) {
@@ -92,14 +105,29 @@ function renderMatrixCell(teamId, dayISO) {
   const matches = matchesForCell(teamId, dayISO);
   if (!matches.length) return '<td class="matrix-cell' + (isWeekendDay(dayISO) ? ' matrix-cell--weekend' : '') + '"></td>';
 
-  const dots = matches.map(function (m) {
+  const blocks = matches.map(function (m) {
     const techs = (m.technicianIds || [])
       .map(function (id) { const t = state.technicians.find(function (x) { return x.id === id; }); return t ? t.initials : '?'; })
       .join(', ');
     const title = (m.time || '') + ' ' + (m.homeAway === 'visitante' ? '@' : 'vs') + ' ' + (m.rival || '?') +
       ' [' + matchTypeLabel(m.type) + (m.jornada ? ' J' + m.jornada : '') + ']' + (techs ? ' — Técnicos: ' + techs : ' — sin técnico');
-    return '<span class="match-dot match-dot--' + safeText(m.type || 'liga') + '" data-match-id="' + m.id + '" title="' + safeText(title) + '"></span>';
+    const dot = '<span class="match-dot match-dot--' + safeText(m.type || 'liga') + '" data-match-id="' + m.id + '" title="' + safeText(title) + '"></span>';
+    const addSelect = renderMatrixTechAdd(m);
+    return '<div class="matrix-match-block">' + dot + addSelect + '</div>';
   }).join('');
 
-  return '<td class="matrix-cell' + (isWeekendDay(dayISO) ? ' matrix-cell--weekend' : '') + '"><div class="matrix-cell__dots">' + dots + '</div></td>';
+  return '<td class="matrix-cell' + (isWeekendDay(dayISO) ? ' matrix-cell--weekend' : '') + '"><div class="matrix-cell__dots">' + blocks + '</div></td>';
+}
+
+function renderMatrixTechAdd(m) {
+  const assigned = m.technicianIds || [];
+  if (assigned.length >= 3) return '';
+  const available = state.technicians.filter(function (t) { return t.active !== false && assigned.indexOf(t.id) === -1; });
+  if (!available.length) return '';
+  return (
+    '<select class="matrix-tech-add" data-match-id="' + m.id + '" title="Añadir técnico">' +
+      '<option value="">+</option>' +
+      available.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.initials) + '</option>'; }).join('') +
+    '</select>'
+  );
 }
