@@ -7,15 +7,18 @@
 // reconoce con seguridad, se marca para revisión — nunca se inventa.
 // ================================================
 
-const DOW_ES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-
-function normalizeAccents(str) {
-  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-}
+// ================================================
+// MATCH-IMPORT.JS — Carga por lista en Calendario Equipos
+// Formato esperado por línea, separado por "|":
+//   Fecha | Rival | Local/Visitante | Jornada
+//   26/09/2026 | C.F. Fuenlabrada S.A.D. Cadete A | LOCAL | Jor. 1
+// Si hay número de jornada, se asume Liga automáticamente. Lo que no se
+// reconozca con seguridad se marca para revisión — nunca se inventa.
+// ================================================
 
 function parseMatchLine(line) {
   const parts = line.split('|').map(function (p) { return p.trim(); });
-  const [fechaRaw, diaRaw, rivalRaw, localVisRaw, tipoRaw, horaRaw] = parts;
+  const [fechaRaw, rivalRaw, localVisRaw, jornadaRaw] = parts;
   const issues = [];
 
   let date = '';
@@ -30,13 +33,6 @@ function parseMatchLine(line) {
   }
   if (!date) issues.push('fecha no reconocida');
 
-  if (date && diaRaw) {
-    const realDow = DOW_ES[new Date(date + 'T00:00:00').getDay()];
-    if (normalizeAccents(diaRaw) !== normalizeAccents(realDow)) {
-      issues.push('el día no coincide con la fecha (es ' + realDow + ')');
-    }
-  }
-
   const rival = rivalRaw || '';
   if (!rival) issues.push('sin rival');
 
@@ -48,21 +44,15 @@ function parseMatchLine(line) {
   }
   if (!homeAway) issues.push('local/visitante no reconocido');
 
+  let jornada = null;
   let type = 'liga';
-  if (tipoRaw) {
-    const found = MATCH_TYPES.find(function (t) { return t.label.toLowerCase() === tipoRaw.toLowerCase(); });
-    if (found) type = found.id;
-    else issues.push('tipo "' + tipoRaw + '" no reconocido, se deja Liga');
+  if (jornadaRaw) {
+    const jm = jornadaRaw.match(/(\d+)/);
+    if (jm) jornada = parseInt(jm[1], 10);
+    else issues.push('jornada "' + jornadaRaw + '" sin número reconocible');
   }
 
-  let time = '';
-  if (horaRaw) {
-    const hm = horaRaw.match(/^(\d{1,2}):(\d{2})$/);
-    if (hm) time = hm[1].padStart(2, '0') + ':' + hm[2];
-    else issues.push('hora no reconocida');
-  }
-
-  return { raw: line, date: date, rival: rival, homeAway: homeAway, type: type, time: time, issues: issues };
+  return { raw: line, date: date, rival: rival, homeAway: homeAway, type: type, jornada: jornada, issues: issues };
 }
 
 function openImportModal() {
@@ -77,7 +67,7 @@ function openImportModal() {
           TEAMS.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.name) + '</option>'; }).join('') +
         '</select></div>' +
       '<div class="rm-field"><label class="rm-label">Pega la lista (una línea por partido)</label>' +
-        '<textarea class="rm-textarea" id="imp-text" rows="7" placeholder="20/09/2026 | Domingo | Albacete | Visitante | Liga | 18:00"></textarea></div>' +
+        '<textarea class="rm-textarea" id="imp-text" rows="7" placeholder="26/09/2026 | C.F. Fuenlabrada S.A.D. Cadete A | LOCAL | Jor. 1"></textarea></div>' +
       '<button class="rm-button rm-button--gold rm-button--small" id="imp-preview" type="button">Previsualizar</button>' +
       '<div id="imp-preview-area" style="margin-top:16px"></div>' +
       '<div class="rm-modal__actions" id="imp-actions"></div>' +
@@ -100,7 +90,7 @@ function renderImportPreview(backdrop) {
   area.innerHTML =
     '<div class="rm-section-title">Vista previa — revisa antes de confirmar</div>' +
     '<div class="rm-table-wrap"><table class="rm-table"><thead><tr>' +
-      '<th></th><th>Fecha</th><th>Rival</th><th>L/V</th><th>Tipo</th><th>Hora</th><th>Avisos</th>' +
+      '<th></th><th>Fecha</th><th>Rival</th><th>L/V</th><th>Jornada</th><th>Tipo</th><th>Avisos</th>' +
     '</tr></thead><tbody>' +
       parsed.map(function (p, i) { return renderPreviewRow(p, i); }).join('') +
     '</tbody></table></div>';
@@ -122,10 +112,10 @@ function renderPreviewRow(p, i) {
         '<option value="local"' + (p.homeAway === 'local' ? ' selected' : '') + '>Local</option>' +
         '<option value="visitante"' + (p.homeAway === 'visitante' ? ' selected' : '') + '>Visitante</option>' +
       '</select></td>' +
+      '<td><input class="rm-input imp-jornada" type="number" min="1" value="' + (p.jornada != null ? p.jornada : '') + '" style="min-height:34px;padding:6px;width:70px" /></td>' +
       '<td><select class="rm-select imp-type" style="min-height:34px;padding:6px">' +
         MATCH_TYPES.map(function (t) { return '<option value="' + t.id + '"' + (p.type === t.id ? ' selected' : '') + '>' + safeText(t.label) + '</option>'; }).join('') +
       '</select></td>' +
-      '<td><input class="rm-input imp-time" type="time" value="' + p.time + '" style="min-height:34px;padding:6px" /></td>' +
       '<td class="import-row__issues">' + (hasIssues ? safeText(p.issues.join(' · ')) : '✓') + '</td>' +
     '</tr>'
   );
@@ -141,13 +131,15 @@ function confirmImport(backdrop) {
     if (!qs('.imp-include', row).checked) { skipped++; return; }
     const date = qs('.imp-date', row).value;
     if (!date) { skipped++; return; } // sin fecha no se crea, no se inventa
+    const jornadaVal = qs('.imp-jornada', row).value;
     toCreate.push({
       date: date,
-      time: qs('.imp-time', row).value || null,
+      time: null,
       teamId: teamId,
       rival: qs('.imp-rival', row).value.trim(),
       homeAway: qs('.imp-homeaway', row).value,
       type: qs('.imp-type', row).value,
+      jornada: jornadaVal ? parseInt(jornadaVal, 10) : null,
       technicianIds: [],
     });
   });
