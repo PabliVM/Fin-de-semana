@@ -16,6 +16,10 @@
 // reconozca con seguridad se marca para revisión — nunca se inventa.
 // ================================================
 
+function normalizeAccents(str) {
+  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function parseMatchLine(line) {
   const parts = line.split('|').map(function (p) { return p.trim(); });
   const [fechaRaw, rivalRaw, localVisRaw, jornadaRaw] = parts;
@@ -45,12 +49,25 @@ function parseMatchLine(line) {
   if (!homeAway) issues.push('local/visitante no reconocido');
 
   let jornada = null;
-  let type = 'liga';
+  let type = '';
   if (jornadaRaw) {
-    const jm = jornadaRaw.match(/(\d+)/);
-    if (jm) jornada = parseInt(jm[1], 10);
-    else issues.push('jornada "' + jornadaRaw + '" sin número reconocible');
+    const jm = jornadaRaw.match(/jor/i);
+    const num = jornadaRaw.match(/(\d+)/);
+    if (jm && num) {
+      type = 'liga';
+      jornada = parseInt(num[1], 10);
+    } else {
+      const found = MATCH_TYPES.find(function (t) { return normalizeAccents(jornadaRaw).indexOf(normalizeAccents(t.label)) !== -1; });
+      if (found) {
+        type = found.id;
+      } else if (num) {
+        // solo un número, sin "jor" ni palabra de tipo: lo tomamos como jornada igualmente
+        type = 'liga';
+        jornada = parseInt(num[1], 10);
+      }
+    }
   }
+  if (!type) { type = 'liga'; issues.push('no se reconoce "' + (jornadaRaw || '') + '" (¿jornada o tipo? revisa)'); }
 
   return { raw: line, date: date, rival: rival, homeAway: homeAway, type: type, jornada: jornada, issues: issues };
 }
@@ -64,7 +81,7 @@ function openImportModal() {
       '<h2 class="rm-modal__title">Carga por lista</h2>' +
       '<div class="rm-field"><label class="rm-label">Equipo</label>' +
         '<select class="rm-select" id="imp-team">' +
-          TEAMS.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.name) + '</option>'; }).join('') +
+          TEAMS.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.short) + '</option>'; }).join('') +
         '</select></div>' +
       '<div class="rm-field"><label class="rm-label">Pega la lista (una línea por partido)</label>' +
         '<textarea class="rm-textarea" id="imp-text" rows="7" placeholder="26/09/2026 | C.F. Fuenlabrada S.A.D. Cadete A | LOCAL | Jor. 1"></textarea></div>' +
