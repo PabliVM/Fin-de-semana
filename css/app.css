@@ -380,6 +380,47 @@
 .match-list-table td:nth-child(1) { width: 90px; }
 .match-list-lv { width: 28px; text-align: center; font-weight: 700; }
 
+.match-type-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--rm-radius-pill);
+  color: var(--rm-white);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.match-type-legend {
+  display: flex;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.match-type-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--rm-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.match-type-legend__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.match-type-legend__dot--liga { background: var(--rm-brand-primary); }
+.match-type-legend__dot--amistoso { background: var(--rm-text-muted); }
+.match-type-legend__dot--torneo { background: var(--rm-brand-gold); }
+.match-type-legend__dot--liga-postponed { background: #38bdf8; }
+
+.match-type-chip--liga { background: var(--rm-brand-primary); }
+.match-type-chip--amistoso { background: var(--rm-text-muted); }
+.match-type-chip--torneo { background: var(--rm-brand-gold); color: var(--rm-brand-primary-deep); }
+.match-type-chip--liga-postponed { background: #38bdf8; color: var(--rm-brand-primary-deep); }
+
 .match-list-row__actions {
   display: flex;
   gap: 4px;
@@ -428,6 +469,7 @@
 .match-tech-grid--liga { background: var(--rm-brand-primary); }
 .match-tech-grid--amistoso { background: var(--rm-text-muted); }
 .match-tech-grid--torneo { background: var(--rm-brand-gold); color: var(--rm-brand-primary-deep); }
+.match-tech-grid--liga-postponed { background: #38bdf8; }
 
 .import-row--warn {
   background: rgba(234, 88, 12, 0.06);
