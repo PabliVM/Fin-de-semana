@@ -16,6 +16,7 @@ function initTechniciansData() {
       if (state.activeTab === 'inicio') safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
       if (state.activeTab === 'informe') safeRender(renderPanelInforme, qs('.tab-panel[data-tab="informe"]'));
       if (state.activeTab === 'viernes') safeRender(renderPanelViernes, qs('.tab-panel[data-tab="viernes"]'));
+      if (state.activeTab === 'calendario-equipos') safeRender(renderPanelCalendarioEquipos, qs('.tab-panel[data-tab="calendario-equipos"]'));
     }, function (err) { showError('Error cargando técnicos: ' + err.message); });
 
     _unsubAssign = listenCollection('technicianAssignments', function (rows) {
