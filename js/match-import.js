@@ -42,11 +42,11 @@ function parseMatchLine(line) {
 
   let homeAway = '';
   if (localVisRaw) {
-    const lv = localVisRaw.toLowerCase();
-    if (lv.indexOf('local') === 0) homeAway = 'local';
-    else if (lv.indexOf('visit') === 0) homeAway = 'visitante';
+    const lv = normalizeAccents(localVisRaw).trim();
+    if (lv === 'l' || lv === 'h' || lv.indexOf('local') === 0 || lv.indexOf('casa') === 0) homeAway = 'local';
+    else if (lv === 'v' || lv === 'a' || lv.indexOf('visit') === 0 || lv.indexOf('fuera') === 0) homeAway = 'visitante';
   }
-  if (!homeAway) issues.push('local/visitante no reconocido');
+  if (!homeAway) issues.push('local/visitante no reconocido ("' + (localVisRaw || '') + '")');
 
   let jornada = null;
   let type = '';
