@@ -345,6 +345,10 @@
   flex: 0 0 auto;
 }
 
+.matrix-tech-add option {
+  font-size: 16px;
+}
+
 .match-list-row {
   cursor: pointer;
 }
