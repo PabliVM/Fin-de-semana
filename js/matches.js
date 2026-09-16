@@ -17,9 +17,10 @@ function initMatchesData() {
   }, function (err) { showError('Error cargando partidos: ' + err.message); });
 }
 
-function sortedMatchesList(teamIds) {
+function sortedMatchesList(teamIds, type) {
   return state.matches
     .filter(function (m) { return !teamIds.length || teamIds.indexOf(m.teamId) !== -1; })
+    .filter(function (m) { return !type || m.type === type; })
     .slice()
     .sort(function (a, b) { return (a.date + (a.time || '00:00')).localeCompare(b.date + (b.time || '00:00')); });
 }
@@ -35,7 +36,8 @@ function toggleCalendarioTeam(teamId) {
 function renderPanelCalendarioEquipos(container) {
   if (!container) return;
   const teamIds = state.calendarioEquiposTeams;
-  const matches = sortedMatchesList(teamIds);
+  const type = state.calendarioEquiposType;
+  const matches = sortedMatchesList(teamIds, type);
   const showTeamCol = teamIds.length !== 1;
 
   container.innerHTML =
@@ -51,16 +53,23 @@ function renderPanelCalendarioEquipos(container) {
       '<button class="rm-pill-button' + (!teamIds.length ? ' is-active' : '') + '" data-team="">Todos</button>' +
       TEAMS.map(function (t) { return '<button class="rm-pill-button' + (teamIds.indexOf(t.id) !== -1 ? ' is-active' : '') + '" data-team="' + t.id + '">' + safeText(t.short) + '</button>'; }).join('') +
     '</div>' +
+    '<div class="team-tabs" style="margin-bottom:16px">' +
+      '<button class="rm-pill-button' + (!type ? ' is-active' : '') + '" data-type="">Todos</button>' +
+      MATCH_TYPES.map(function (t) { return '<button class="rm-pill-button' + (type === t.id ? ' is-active' : '') + '" data-type="' + t.id + '">' + safeText(t.label) + '</button>'; }).join('') +
+    '</div>' +
     (matches.length
       ? '<div class="rm-table-wrap"><table class="rm-table match-list-table"><thead><tr>' +
           '<th>Fecha</th>' + (showTeamCol ? '<th>Equipo</th>' : '') + '<th>Rival</th><th>L/V</th><th>Tipo</th><th>Técnicos</th><th></th>' +
         '</tr></thead><tbody>' +
           matches.map(function (m) { return renderMatchListRow(m, showTeamCol); }).join('') +
         '</tbody></table></div>'
-      : '<div class="rm-card"><p class="rm-card__text">No hay partidos cargados todavía.</p></div>');
+      : '<div class="rm-card"><p class="rm-card__text">No hay partidos con este filtro.</p></div>');
 
   qsa('.team-tabs [data-team]', container).forEach(function (btn) {
     btn.addEventListener('click', function () { toggleCalendarioTeam(btn.dataset.team); renderPanelCalendarioEquipos(container); });
+  });
+  qsa('.team-tabs [data-type]', container).forEach(function (btn) {
+    btn.addEventListener('click', function () { setState({ calendarioEquiposType: btn.dataset.type }); renderPanelCalendarioEquipos(container); });
   });
   qs('#btn-add-match', container).addEventListener('click', function () { openMatchModal(null); });
   qs('#btn-import-matches', container).addEventListener('click', function () { openImportModal(); });
