@@ -13,6 +13,7 @@ function initMatchesData() {
   _unsubMatches = listenCollection('matches', function (rows) {
     setState({ matches: rows });
     if (state.activeTab === 'calendario-equipos') safeRender(renderPanelCalendarioEquipos, qs('.tab-panel[data-tab="calendario-equipos"]'));
+    if (state.activeTab === 'inicio') safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
   }, function (err) { showError('Error cargando partidos: ' + err.message); });
 }
 
@@ -35,13 +36,17 @@ function renderPanelCalendarioEquipos(container) {
     (isFirebaseUnconfigured() ? '<div class="firebase-notice rm-card" style="margin-bottom:16px">⚠ Firebase pendiente de configurar — edita js/firebase-config.js</div>' : '') +
     '<div class="rm-view-heading" style="display:flex;align-items:center;justify-content:space-between;border:0;padding:0;margin-bottom:16px">' +
       '<div><h1 class="rm-view-title">Calendario equipos</h1><span class="rm-view-subtitle">' + state.matches.length + ' partidos</span></div>' +
-      '<button class="rm-button rm-button--primary rm-button--small" id="btn-add-match" type="button">+ Nuevo partido</button>' +
+      '<div style="display:flex;gap:8px">' +
+        '<button class="rm-button rm-button--ghost rm-button--small" id="btn-import-matches" type="button">📋 Carga por lista</button>' +
+        '<button class="rm-button rm-button--primary rm-button--small" id="btn-add-match" type="button">+ Nuevo partido</button>' +
+      '</div>' +
     '</div>' +
     (days.length
       ? days.map(renderMatchDayGroup).join('')
       : '<div class="rm-card"><p class="rm-card__text">No hay partidos cargados todavía.</p></div>');
 
   qs('#btn-add-match', container).addEventListener('click', function () { openMatchModal(null); });
+  qs('#btn-import-matches', container).addEventListener('click', function () { openImportModal(); });
   qsa('[data-action="edit-match"]', container).forEach(function (btn) {
     btn.addEventListener('click', function () {
       const match = state.matches.find(function (m) { return m.id === btn.dataset.id; });
@@ -129,7 +134,20 @@ function openMatchModal(match) {
   qs('#modal-close', backdrop).addEventListener('click', function () { backdrop.remove(); });
   backdrop.addEventListener('click', function (e) { if (e.target === backdrop) backdrop.remove(); });
 
+  function enforceTechLimit() {
+    const checked = qsa('.m-tech:checked', backdrop);
+    qsa('.m-tech', backdrop).forEach(function (cb) { cb.disabled = !cb.checked && checked.length >= 3; });
+  }
+  qsa('.m-tech', backdrop).forEach(function (cb) { cb.addEventListener('change', enforceTechLimit); });
+  enforceTechLimit();
+
   qs('#modal-save', backdrop).addEventListener('click', function () {
+    const technicianIds = qsa('.m-tech:checked', backdrop).map(function (cb) { return cb.value; });
+
+    if (!qs('#m-date', backdrop).value) { showError('La fecha es obligatoria.'); return; }
+    if (!qs('#m-team', backdrop).value) { showError('Elige un equipo.'); return; }
+    if (technicianIds.length > 3) { showError('Máximo 3 técnicos por partido.'); return; }
+
     const data = {
       date: qs('#m-date', backdrop).value,
       time: qs('#m-time', backdrop).value || null,
@@ -137,10 +155,8 @@ function openMatchModal(match) {
       rival: qs('#m-rival', backdrop).value.trim(),
       homeAway: qs('#m-homeaway', backdrop).value,
       type: qs('#m-type', backdrop).value,
-      technicianIds: qsa('.m-tech:checked', backdrop).map(function (cb) { return cb.value; }),
+      technicianIds: technicianIds,
     };
-    if (!data.date) { showError('La fecha es obligatoria.'); return; }
-    if (!data.teamId) { showError('Elige un equipo.'); return; }
 
     const promise = match ? updateDocument('matches', match.id, data) : addDocument('matches', data);
     promise
