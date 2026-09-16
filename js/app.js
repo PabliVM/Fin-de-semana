@@ -7,6 +7,7 @@ const PANEL_RENDERERS = {
   tecnicos: renderPanelTecnicos,
   libranzas: renderPanelLibranzas,
   viernes: renderPanelViernes,
+  'calendario-equipos': renderPanelCalendarioEquipos,
   informe: renderPanelInforme,
 };
 
@@ -59,6 +60,7 @@ function boot() {
     initSightingsData();
     initTimeOffData();
     initFridayShiftsData();
+    initMatchesData();
   }
 }
 
