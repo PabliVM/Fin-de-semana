@@ -229,6 +229,11 @@
   background: var(--rm-brand-primary-deep);
 }
 
+.matrix-cell {
+  min-height: 44px;
+  vertical-align: middle;
+}
+
 .matrix-cell--weekend {
   background: var(--rm-surface-alt);
 }
@@ -237,7 +242,42 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 3px;
+  padding: 3px 0;
+}
+
+.matrix-match-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.matrix-tech-add {
+  width: 22px;
+  min-height: 16px;
+  padding: 0;
+  border: 1px solid var(--rm-border);
+  border-radius: 3px;
+  background: var(--rm-surface);
+  color: var(--rm-text-muted);
+  font-size: 8px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.match-list-row {
+  cursor: pointer;
+}
+
+.match-list-row:hover {
+  background: var(--rm-surface-alt);
+}
+
+.match-list-table td,
+.match-list-table th {
+  padding: 8px 10px;
+  font-size: 12px;
 }
 
 .match-dot {
