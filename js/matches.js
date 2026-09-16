@@ -164,7 +164,7 @@ function openMatchModal(match) {
 
   function enforceTechLimit() {
     const checked = qsa('.m-tech:checked', backdrop);
-    qsa('.m-tech', backdrop).forEach(function (cb) { cb.disabled = !cb.checked && checked.length >= 3; });
+    qsa('.m-tech', backdrop).forEach(function (cb) { cb.disabled = !cb.checked && checked.length >= 4; });
   }
   qsa('.m-tech', backdrop).forEach(function (cb) { cb.addEventListener('change', enforceTechLimit); });
   enforceTechLimit();
@@ -174,7 +174,7 @@ function openMatchModal(match) {
 
     if (!qs('#m-date', backdrop).value) { showError('La fecha es obligatoria.'); return; }
     if (!qs('#m-team', backdrop).value) { showError('Elige un equipo.'); return; }
-    if (technicianIds.length > 3) { showError('Máximo 3 técnicos por partido.'); return; }
+    if (technicianIds.length > 4) { showError('Máximo 4 técnicos por partido.'); return; }
 
     const data = {
       date: qs('#m-date', backdrop).value,
