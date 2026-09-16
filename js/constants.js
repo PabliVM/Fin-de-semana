@@ -2,9 +2,9 @@
 // CONSTANTS.JS — Constantes de la app Técnicos RM
 // ================================================
 
-const APP_NAME = 'Fin de Semana';
+const APP_NAME = 'Coordinación Equipos';
 const LOGO_PATH = './rm.png';
-const FOOTER_TEXT = 'Cantera del Real Madrid CF — Fin de Semana';
+const FOOTER_TEXT = 'Cantera del Real Madrid CF — Coordinación Equipos';
 
 // Para añadir una temporada nueva, añade otro objeto aquí (id único).
 const SEASONS = [
@@ -41,8 +41,20 @@ const TABS = [
   { key: 'tecnicos', label: 'Técnicos' },
   { key: 'libranzas', label: 'Libranzas' },
   { key: 'viernes', label: 'Turno viernes tarde' },
+  { key: 'calendario-equipos', label: 'Calendario equipos' },
   { key: 'informe', label: 'Informe general' },
 ];
+
+const MATCH_TYPES = [
+  { id: 'liga', label: 'Liga' },
+  { id: 'amistoso', label: 'Amistoso' },
+  { id: 'torneo', label: 'Torneo' },
+];
+
+function matchTypeLabel(id) {
+  const t = MATCH_TYPES.find((m) => m.id === id);
+  return t ? t.label : id;
+}
 
 function teamById(id) {
   return TEAMS.find((t) => t.id === id) || null;
