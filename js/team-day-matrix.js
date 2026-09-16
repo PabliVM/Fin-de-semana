@@ -42,10 +42,12 @@ function matchesForCell(teamId, dayISO) {
 function renderPanelInicio(container) {
   if (!container) return;
   const prevWrap = qs('.matrix-wrap', container);
-  const scrollLeft = prevWrap ? prevWrap.scrollLeft : 0;
+  const days = matrixDayRange();
+  const todayIndex = days.indexOf(todayISO());
+  const defaultScrollLeft = todayIndex > -1 ? Math.max(0, todayIndex * 70 - 300) : 0;
+  const scrollLeft = prevWrap ? prevWrap.scrollLeft : defaultScrollLeft;
   const scrollTop = prevWrap ? prevWrap.scrollTop : 0;
 
-  const days = matrixDayRange();
   const monthGroups = matrixMonthGroups(days);
   const techs = state.technicians;
 
