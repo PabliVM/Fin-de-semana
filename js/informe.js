@@ -38,27 +38,11 @@ function renderPanelInforme(container) {
 
   container.innerHTML =
     '<div class="rm-view-heading" style="border:0;padding:0;margin-bottom:16px">' +
-      '<h1 class="rm-view-title">Informe general</h1>' +
+      '<h1 class="rm-view-title">Informe</h1>' +
     '</div>' +
-    '<div class="informe-subtabs">' +
-      '<button class="rm-pill-button' + (state.informeView === 'calendario' ? ' is-active' : '') + '" data-view="calendario" type="button">Calendario general</button>' +
-      '<button class="rm-pill-button' + (state.informeView === 'ficha' ? ' is-active' : '') + '" data-view="ficha" type="button">Ficha individual</button>' +
-    '</div>' +
-    '<div id="informe-body" style="margin-top:16px"></div>';
+    '<div id="informe-body"></div>';
 
-  qsa('[data-view]', container).forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      setState({ informeView: btn.dataset.view });
-      renderPanelInforme(container);
-    });
-  });
-
-  const body = qs('#informe-body', container);
-  if (state.informeView === 'ficha') {
-    renderFichaIndividual(body);
-    return;
-  }
-  renderCalendarioGeneral(body);
+  renderFichaIndividual(qs('#informe-body', container));
 }
 
 function lastSightingDateByTeam(technicianId) {
