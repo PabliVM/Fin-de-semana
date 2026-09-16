@@ -335,10 +335,10 @@
   min-height: 14px;
   padding: 0;
   border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--rm-white);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--rm-text);
   font-size: 8px;
   text-align: center;
   cursor: pointer;
@@ -412,9 +412,9 @@
   opacity: 0.5;
 }
 
-.match-tech-grid--liga .match-tech-cell { background: var(--rm-brand-primary); }
-.match-tech-grid--amistoso .match-tech-cell { background: var(--rm-text-muted); }
-.match-tech-grid--torneo .match-tech-cell { background: var(--rm-brand-gold); color: var(--rm-brand-primary-deep); }
+.match-tech-grid--liga { background: var(--rm-brand-primary); }
+.match-tech-grid--amistoso { background: var(--rm-text-muted); }
+.match-tech-grid--torneo { background: var(--rm-brand-gold); color: var(--rm-brand-primary-deep); }
 
 .import-row--warn {
   background: rgba(234, 88, 12, 0.06);
