@@ -17,6 +17,7 @@ const state = {
   teamDates: {}, // { [teamId]: 'YYYY-MM-DD' } fecha de inicio por equipo, configurable
   fichaTechnicianId: null, // técnico seleccionado en Ficha individual
   calendarioEquiposTeams: [], // [] = todos los equipos; si no, solo estos
+  calendarioEquiposType: '', // '' = todos los tipos; si no, 'liga'|'amistoso'|'torneo'
   selectedSeasonId: null, // se inicializa en boot() a la última temporada
 };
 
