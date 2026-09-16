@@ -11,8 +11,13 @@ const SEASONS = [
   { id: '2026-2027', start: '2026-09-01', end: '2027-06-30', label: '2026/2027' },
 ];
 
+function allSeasons() {
+  return SEASONS.concat(state.extraSeasons || []);
+}
+
 function seasonById(id) {
-  return SEASONS.find((s) => s.id === id) || SEASONS[0];
+  const list = allSeasons();
+  return list.find((s) => s.id === id) || list[list.length - 1];
 }
 
 // Equipos Cantera, orden confirmado por Pablo.
