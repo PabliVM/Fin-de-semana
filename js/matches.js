@@ -99,7 +99,7 @@ function renderMatchListRow(m, showTeamCol) {
       '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(formatDate(m.date)) + (m.time ? ' ' + safeText(m.time) : '') + '</td>' +
       (showTeamCol ? '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(team ? team.short : m.teamId) + '</td>' : '') +
       '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(m.rival || '—') + '</td>' +
-      '<td data-action="edit-match" data-id="' + m.id + '">' + (m.homeAway === 'visitante' ? '@' : 'vs') + '</td>' +
+      '<td class="match-list-lv" data-action="edit-match" data-id="' + m.id + '">' + (m.homeAway === 'visitante' ? 'V' : 'L') + '</td>' +
       '<td data-action="edit-match" data-id="' + m.id + '">' + safeText(matchTypeLabel(m.type)) + (m.jornada ? ' J' + m.jornada : '') + '</td>' +
       '<td data-action="edit-match" data-id="' + m.id + '">' + (techs || '<em>—</em>') + '</td>' +
       '<td class="match-list-row__actions">' +
