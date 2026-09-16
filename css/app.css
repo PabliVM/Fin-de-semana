@@ -202,21 +202,30 @@
   overflow-y: auto;
   overflow-x: auto;
   scrollbar-width: auto;
+  scrollbar-color: var(--rm-brand-primary) var(--rm-border);
 }
 
 .matrix-wrap::-webkit-scrollbar {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 .matrix-wrap::-webkit-scrollbar-track {
-  background: var(--rm-surface-alt);
+  background: var(--rm-border);
 }
 
 .matrix-wrap::-webkit-scrollbar-thumb {
   background: var(--rm-brand-primary);
-  border-radius: 7px;
-  border: 3px solid var(--rm-surface-alt);
+  border-radius: 9px;
+  border: 2px solid var(--rm-border);
+}
+
+.matrix-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--rm-brand-primary-hover);
+}
+
+.matrix-wrap::-webkit-scrollbar-corner {
+  background: var(--rm-border);
 }
 
 .matrix-table {
