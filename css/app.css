@@ -178,9 +178,9 @@
 
 .matrix-table th,
 .matrix-table td {
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
   padding: 2px 0;
   border-left: 1px solid var(--rm-border);
   text-align: center;
