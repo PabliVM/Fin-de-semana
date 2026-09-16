@@ -76,7 +76,7 @@ function renderTechRow(t, isFirst, isLast) {
   const teams = currentAssignmentsFor(t.id)
     .slice()
     .sort(function (a, b) { return teamOrderIndex(a.teamId) - teamOrderIndex(b.teamId); })
-    .map(function (a) { const team = teamById(a.teamId); return team ? team.name : a.teamId; })
+    .map(function (a) { const team = teamById(a.teamId); return team ? team.short : a.teamId; })
     .join(' · ') || 'Sin equipos asignados';
 
   row.innerHTML =
@@ -167,7 +167,7 @@ function renderNewTechTeamsBlock() {
     '<div class="rm-grid">' +
       TEAMS.map(function (t) {
         return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--rm-text)">' +
-          '<input type="checkbox" class="f-new-team" value="' + t.id + '" /> ' + safeText(t.name) +
+          '<input type="checkbox" class="f-new-team" value="' + t.id + '" /> ' + safeText(t.short) +
         '</label>';
       }).join('') +
     '</div>'
@@ -221,7 +221,7 @@ function renderAssignmentsBlock(technician) {
     '<div class="rm-field" style="display:flex;gap:8px;align-items:flex-end">' +
       '<div style="flex:1"><label class="rm-label">Añadir equipo</label>' +
         '<select class="rm-select" id="f-assign-team">' +
-          (availableTeams.length ? availableTeams.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.name) + '</option>'; }).join('') : '<option value="">Sin equipos disponibles</option>') +
+          (availableTeams.length ? availableTeams.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.short) + '</option>'; }).join('') : '<option value="">Sin equipos disponibles</option>') +
         '</select></div>' +
       '<div><label class="rm-label">Desde</label>' +
         '<input class="rm-input" id="f-assign-start" type="date" value="' + todayISO() + '" style="width:150px" /></div>' +
@@ -238,7 +238,7 @@ function renderAssignRow(a) {
   const closed = !!a.endDate;
   return (
     '<div class="assign-row' + (closed ? ' is-closed' : '') + '" data-assign-id="' + a.id + '">' +
-      '<span class="assign-row__team">' + safeText(team ? team.name : a.teamId) + '</span>' +
+      '<span class="assign-row__team">' + safeText(team ? team.short : a.teamId) + '</span>' +
       '<span class="assign-row__dates">' + formatDate(a.startDate) + ' → ' + (a.endDate ? formatDate(a.endDate) : 'actual') + '</span>' +
       (closed ? '' : '<button class="rm-button rm-button--ghost rm-button--small" data-action="end-assign">Finalizar</button>') +
     '</div>'
