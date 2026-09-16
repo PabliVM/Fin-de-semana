@@ -1,6 +1,7 @@
 // ================================================
-// TIMEOFF.JS — Pestaña Libranzas: findes libres por técnico
-// Firestore: colección timeOffRequests { technicianId, weekendDate, note }
+// TIMEOFF.JS — Pestaña Libranzas: rango de fechas por técnico
+// Firestore: colección timeOffRequests { technicianId, startDate, endDate, note }
+// Compatibilidad: docs antiguos solo tienen weekendDate (se tratan como un día suelto).
 // ================================================
 
 let _unsubTimeOff = null;
@@ -12,15 +13,34 @@ function initTimeOffData() {
     if (state.activeTab === 'libranzas') safeRender(renderPanelLibranzas, qs('.tab-panel[data-tab="libranzas"]'));
     if (state.activeTab === 'inicio') safeRender(renderPanelInicio, qs('.tab-panel[data-tab="inicio"]'));
     if (state.activeTab === 'viernes') safeRender(renderPanelViernes, qs('.tab-panel[data-tab="viernes"]'));
+    if (state.activeTab === 'calendario-equipos') safeRender(renderPanelCalendarioEquipos, qs('.tab-panel[data-tab="calendario-equipos"]'));
   }, function (err) { showError('Error cargando libranzas: ' + err.message); });
 }
 
-function isTechOffThatWeekend(technicianId, weekendDate) {
-  return state.timeOffRequests.some(function (r) { return r.technicianId === technicianId && r.weekendDate === weekendDate; });
+function timeOffRange(r) {
+  // Compatibilidad con libranzas antiguas de un solo finde (weekendDate).
+  return { start: r.startDate || r.weekendDate, end: r.endDate || r.weekendDate };
 }
 
-function timeOffFor(technicianId, weekendDate) {
-  return state.timeOffRequests.find(function (r) { return r.technicianId === technicianId && r.weekendDate === weekendDate; }) || null;
+function isTechOffOnDate(technicianId, dateISO) {
+  return state.timeOffRequests.some(function (r) {
+    if (r.technicianId !== technicianId) return false;
+    const range = timeOffRange(r);
+    return dateISO >= range.start && dateISO <= range.end;
+  });
+}
+
+// Alias por compatibilidad: sightings.js y friday-shifts.js llaman a esto con un weekendDate.
+function isTechOffThatWeekend(technicianId, weekendDate) {
+  return isTechOffOnDate(technicianId, weekendDate);
+}
+
+function timeOffFor(technicianId, dateISO) {
+  return state.timeOffRequests.find(function (r) {
+    if (r.technicianId !== technicianId) return false;
+    const range = timeOffRange(r);
+    return dateISO >= range.start && dateISO <= range.end;
+  }) || null;
 }
 
 function renderPanelLibranzas(container) {
@@ -28,22 +48,24 @@ function renderPanelLibranzas(container) {
   const techs = sortedTechnicians().filter(function (t) { return t.active !== false; });
   const upcoming = state.timeOffRequests
     .slice()
-    .sort(function (a, b) { return (a.weekendDate || '').localeCompare(b.weekendDate || ''); });
+    .sort(function (a, b) { return timeOffRange(a).start.localeCompare(timeOffRange(b).start); });
 
   container.innerHTML =
     (isFirebaseUnconfigured() ? '<div class="firebase-notice rm-card" style="margin-bottom:16px">⚠ Firebase pendiente de configurar — edita js/firebase-config.js</div>' : '') +
     '<div class="rm-view-heading" style="border:0;padding:0;margin-bottom:16px">' +
       '<h1 class="rm-view-title">Libranzas</h1>' +
-      '<span class="rm-view-subtitle">Findes en los que un técnico no está disponible</span>' +
+      '<span class="rm-view-subtitle">Periodos en los que un técnico no está disponible</span>' +
     '</div>' +
     '<div class="rm-card" style="max-width:560px;margin-bottom:20px">' +
+      '<div class="rm-field"><label class="rm-label">Técnico</label>' +
+        '<select class="rm-select" id="lb-tech">' +
+          techs.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.fullName) + '</option>'; }).join('') +
+        '</select></div>' +
       '<div class="rm-grid">' +
-        '<div class="rm-field"><label class="rm-label">Técnico</label>' +
-          '<select class="rm-select" id="lb-tech">' +
-            techs.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.fullName) + '</option>'; }).join('') +
-          '</select></div>' +
-        '<div class="rm-field"><label class="rm-label">Fin de semana</label>' +
-          '<input class="rm-input" id="lb-date" type="date" value="' + nextWeekendDate() + '" /></div>' +
+        '<div class="rm-field"><label class="rm-label">Desde</label>' +
+          '<input class="rm-input" id="lb-start" type="date" value="' + todayISO() + '" /></div>' +
+        '<div class="rm-field"><label class="rm-label">Hasta</label>' +
+          '<input class="rm-input" id="lb-end" type="date" value="' + todayISO() + '" /></div>' +
       '</div>' +
       '<div class="rm-field"><label class="rm-label">Motivo (opcional)</label>' +
         '<input class="rm-input" id="lb-note" type="text" placeholder="—" /></div>' +
@@ -58,14 +80,21 @@ function renderPanelLibranzas(container) {
 
   qs('#lb-add', container).addEventListener('click', function () {
     const technicianId = qs('#lb-tech', container).value;
-    const rawDate = qs('#lb-date', container).value;
+    const startDate = qs('#lb-start', container).value;
+    let endDate = qs('#lb-end', container).value;
     const note = qs('#lb-note', container).value.trim();
-    if (!technicianId || !rawDate) { showError('Elige técnico y fecha.'); return; }
-    const weekendDate = nextWeekendDate(rawDate); // ajusta al domingo de esa semana
-    addDocument('timeOffRequests', { technicianId: technicianId, weekendDate: weekendDate, note: note })
+    if (!technicianId || !startDate) { showError('Elige técnico y fecha de inicio.'); return; }
+    if (!endDate || endDate < startDate) endDate = startDate;
+
+    addDocument('timeOffRequests', { technicianId: technicianId, startDate: startDate, endDate: endDate, note: note })
       .then(function () {
         showSuccess('Libranza añadida.');
-        return deleteDocument('fridayShifts', fridayShiftId(technicianId, weekendDate));
+        // Borrar turnos de viernes tarde que caigan dentro del rango (la libranza manda).
+        const affected = weekendsInSeason().filter(function (w) {
+          const friday = addDaysISO(w, -2);
+          return (friday >= startDate && friday <= endDate) || (w >= startDate && w <= endDate);
+        });
+        return Promise.all(affected.map(function (w) { return deleteDocument('fridayShifts', fridayShiftId(technicianId, w)); }));
       })
       .catch(function (err) { showError(err.message); });
   });
@@ -81,9 +110,11 @@ function renderPanelLibranzas(container) {
 
 function renderLibranzaRow(r) {
   const tech = state.technicians.find(function (t) { return t.id === r.technicianId; });
+  const range = timeOffRange(r);
+  const dates = range.start === range.end ? formatDate(range.start) : formatDate(range.start) + ' → ' + formatDate(range.end);
   return (
     '<div class="assign-row">' +
-      '<span class="assign-row__team">' + safeText(tech ? tech.fullName : '—') + ' — ' + formatDate(r.weekendDate) + (r.note ? ' (' + safeText(r.note) + ')' : '') + '</span>' +
+      '<span class="assign-row__team">' + safeText(tech ? tech.fullName : '—') + ' — ' + dates + (r.note ? ' (' + safeText(r.note) + ')' : '') + '</span>' +
       '<button class="rm-button rm-button--ghost rm-button--small" data-action="delete-libranza" data-id="' + r.id + '">Eliminar</button>' +
     '</div>'
   );
