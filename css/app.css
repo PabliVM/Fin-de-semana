@@ -2,6 +2,20 @@
 
 .hidden { display: none !important; }
 
+.rm-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.rm-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+  padding: 8px 24px calc(8px + env(safe-area-inset-bottom));
+  font-size: 11px;
+}
+
 .season-select,
 .header-season-label {
   flex: 0 0 auto;
@@ -176,11 +190,16 @@
   table-layout: fixed;
 }
 
+.matrix-col-team {
+  width: 150px;
+}
+
+.matrix-col-day {
+  width: 70px;
+}
+
 .matrix-table th,
 .matrix-table td {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
   padding: 2px 0;
   border-left: 1px solid var(--rm-border);
   text-align: center;
@@ -205,9 +224,9 @@
   color: var(--rm-white);
 }
 
-.matrix-team {
+.matrix-table td.matrix-team {
   background: var(--rm-brand-primary);
-  color: var(--rm-white);
+  color: var(--rm-white) !important;
   font-weight: 700;
   font-size: 11px;
   text-align: left;
@@ -234,8 +253,8 @@
 }
 
 .matrix-cell {
-  height: 50px;
-  max-height: 50px;
+  height: 70px;
+  max-height: 70px;
   overflow-y: auto;
   overflow-x: hidden;
   vertical-align: middle;
