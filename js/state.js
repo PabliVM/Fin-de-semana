@@ -19,6 +19,7 @@ const state = {
   calendarioEquiposTeams: [], // [] = todos los equipos; si no, solo estos
   calendarioEquiposType: '', // '' = todos los tipos; si no, 'liga'|'amistoso'|'torneo'
   selectedSeasonId: null, // se inicializa en boot() a la última temporada
+  extraSeasons: [], // temporadas añadidas desde la app (Firestore), además de SEASONS
 };
 
 function setState(patch) {
