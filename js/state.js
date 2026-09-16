@@ -16,7 +16,7 @@ const state = {
   inicioWeekend: null, // fecha ISO del domingo mostrado en Inicio — se inicializa al abrir la pestaña
   teamDates: {}, // { [teamId]: 'YYYY-MM-DD' } fecha de inicio por equipo, configurable
   fichaTechnicianId: null, // técnico seleccionado en Ficha individual
-  calendarioEquiposTeam: '', // '' = todos los equipos
+  calendarioEquiposTeams: [], // [] = todos los equipos; si no, solo estos
   selectedSeasonId: null, // se inicializa en boot() a la última temporada
 };
 
