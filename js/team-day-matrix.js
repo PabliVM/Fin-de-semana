@@ -52,6 +52,7 @@ function renderPanelInicio(container) {
       '<span class="rm-view-subtitle">Los partidos se crean en "Calendario equipos" — aquí solo se consultan y editan</span>' +
     '</div>' +
     '<div class="rm-table-wrap matrix-wrap"><table class="rm-table matrix-table">' +
+      '<colgroup><col class="matrix-col-team" />' + days.map(function () { return '<col class="matrix-col-day" />'; }).join('') + '</colgroup>' +
       '<thead>' +
         '<tr>' +
           '<th rowspan="2" class="matrix-corner">Equipo</th>' +
