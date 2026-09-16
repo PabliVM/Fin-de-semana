@@ -181,7 +181,8 @@
 }
 
 .matrix-wrap {
-  max-height: 80vh;
+  max-height: 75vh;
+  overflow-y: auto;
 }
 
 .matrix-table {
@@ -219,7 +220,9 @@
 }
 
 .matrix-corner {
-  z-index: 4;
+  top: 0;
+  z-index: 6;
+  height: 20px;
   background: var(--rm-brand-primary);
   color: var(--rm-white);
 }
@@ -229,13 +232,14 @@
   color: var(--rm-white) !important;
   font-weight: 700;
   font-size: 11px;
-  text-align: left;
-  padding-left: 8px;
+  text-align: center;
 }
 
 .matrix-month {
   position: sticky;
   top: 0;
+  z-index: 5;
+  height: 20px;
   background: var(--rm-brand-primary-deep);
   color: var(--rm-white);
   font-size: 10px;
@@ -243,6 +247,9 @@
 }
 
 .matrix-day {
+  position: sticky;
+  top: 20px;
+  z-index: 5;
   background: var(--rm-brand-primary);
   color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
@@ -250,6 +257,14 @@
 
 .matrix-day--weekend {
   background: #10275c;
+}
+
+.matrix-edge-start {
+  border-left: 2px solid var(--rm-brand-gold) !important;
+}
+
+.matrix-edge-end {
+  border-right: 2px solid var(--rm-brand-gold) !important;
 }
 
 .matrix-cell {
@@ -333,26 +348,36 @@
   margin-bottom: 14px;
 }
 
-.match-dot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 36px;
-  height: 16px;
-  padding: 0 3px;
+.match-tech-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1px;
+  width: 32px;
+  height: 32px;
+  padding: 1px;
   border-radius: 4px;
-  color: var(--rm-white);
-  font-size: 8px;
-  font-weight: 700;
   cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.match-dot--liga { background: var(--rm-brand-primary); }
-.match-dot--amistoso { background: var(--rm-text-muted); }
-.match-dot--torneo { background: var(--rm-brand-gold); color: var(--rm-brand-primary-deep); }
+.match-tech-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  color: var(--rm-white);
+  font-size: 7px;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.match-tech-cell--empty {
+  opacity: 0.5;
+}
+
+.match-tech-grid--liga .match-tech-cell { background: var(--rm-brand-primary); }
+.match-tech-grid--amistoso .match-tech-cell { background: var(--rm-text-muted); }
+.match-tech-grid--torneo .match-tech-cell { background: var(--rm-brand-gold); color: var(--rm-brand-primary-deep); }
 
 .import-row--warn {
   background: rgba(234, 88, 12, 0.06);
