@@ -1,30 +1,26 @@
-Cambia la pestaña **Inicio** por un calendario general de toda la temporada, tipo matriz.
+// ================================================
+// SIGHTINGS.JS — Colección "sightings" (histórico del registro por finde)
+// La pantalla de Inicio ya no usa esto (ver team-day-matrix.js) — el partido
+// es ahora el dato principal. Se mantiene la carga porque Informe general y
+// Ficha individual todavía leen de aquí (pendiente el rework a partidos).
+// ================================================
 
-* **Filas:** equipos, desde Castilla hasta Debutante.
-* **Columnas:** todos los días de la temporada, aproximadamente desde mediados de julio hasta junio.
-* Scroll **horizontal** para recorrer toda la temporada.
-* Primera columna de equipos siempre fija.
-* Cabecera superior fija y en 2 niveles:
+let _unsubSightings = null;
 
-  1. **Mes** (JULIO, AGOSTO, etc.), agrupando sus días.
-  2. Debajo, columnas estrechas con cada **día/fecha**: 13, 14, 15, 16...
+function initSightingsData() {
+  if (isFirebaseUnconfigured()) return;
+  _unsubSightings = listenCollection('sightings', function (rows) {
+    setState({ sightings: rows, loaded: Object.assign({}, state.loaded, { sightings: true }) });
+    if (state.activeTab === 'informe') safeRender(renderPanelInforme, qs('.tab-panel[data-tab="informe"]'));
+  }, function (err) { showError('Error cargando visionados: ' + err.message); });
+}
 
-### Partidos
+function sightingId(technicianId, weekendDate) {
+  return technicianId + '_' + weekendDate;
+}
 
-Los partidos se crean/importan desde **Calendario Equipos** y aparecen automáticamente en la celda correspondiente a **equipo + fecha**.
-
-En cada partido mostrar información resumida del encuentro y permitir asignar **hasta 3 técnicos** mediante desplegable con sus iniciales.
-
-Si un equipo tiene más de un partido el mismo día, la celda debe admitir varios partidos.
-
-Si un partido cambia de fecha, al editarlo debe **moverse automáticamente** a la nueva columna.
-
-### Informes
-
-Cada técnico asignado cuenta como un visionado. Usar estos datos después para calcular seguimiento por:
-
-* Técnico
-* Equipo
-* Liga / Amistoso / Torneo
-
-Importante: esta vista debe ser **compacta**, porque habrá ~350 días en horizontal. No hacer columnas grandes.
+function sightingFor(technicianId, weekendDate) {
+  return state.sightings.find(function (s) {
+    return s.technicianId === technicianId && s.weekendDate === weekendDate;
+  }) || null;
+}
