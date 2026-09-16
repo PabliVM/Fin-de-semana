@@ -4,11 +4,13 @@
 
 const state = {
   activeTab: 'inicio',
+  activeGroup: 'equipos',
   technicians: [],
   assignments: [],
   sightings: [],
   timeOffRequests: [],
   fridayShifts: [],
+  fridayNotNeeded: [],
   matches: [],
   loaded: { technicians: false, assignments: false, sightings: false },
   informeView: 'calendario', // 'calendario' | 'ficha'
