@@ -75,7 +75,7 @@ function renderMatchCard(m) {
   return (
     '<div class="rm-card match-card" data-action="edit-match" data-id="' + m.id + '">' +
       '<div class="match-card__top">' +
-        '<span class="rm-badge rm-badge--info">' + safeText(matchTypeLabel(m.type)) + '</span>' +
+        '<span class="rm-badge rm-badge--info">' + safeText(matchTypeLabel(m.type)) + (m.jornada ? ' J' + m.jornada : '') + '</span>' +
         (m.time ? '<span class="match-card__time">' + safeText(m.time) + '</span>' : '') +
       '</div>' +
       '<div class="match-card__teams">' + safeText(team ? team.name : m.teamId) + ' <span class="match-card__vs">' + (m.homeAway === 'visitante' ? '@' : 'vs') + '</span> ' + safeText(m.rival || '—') + '</div>' +
@@ -115,6 +115,8 @@ function openMatchModal(match) {
             MATCH_TYPES.map(function (t) { return '<option value="' + t.id + '"' + (match && match.type === t.id ? ' selected' : '') + '>' + safeText(t.label) + '</option>'; }).join('') +
           '</select></div>' +
       '</div>' +
+      '<div class="rm-field"><label class="rm-label">Jornada (opcional)</label>' +
+        '<input class="rm-input" id="m-jornada" type="number" min="1" value="' + (match && match.jornada != null ? match.jornada : '') + '" style="max-width:120px" /></div>' +
       '<div class="rm-section-title" style="margin-top:16px">Técnicos asignados</div>' +
       '<div class="rm-grid">' +
         sortedTechnicians().filter(function (t) { return t.active !== false; }).map(function (t) {
@@ -155,6 +157,7 @@ function openMatchModal(match) {
       rival: qs('#m-rival', backdrop).value.trim(),
       homeAway: qs('#m-homeaway', backdrop).value,
       type: qs('#m-type', backdrop).value,
+      jornada: qs('#m-jornada', backdrop).value ? parseInt(qs('#m-jornada', backdrop).value, 10) : null,
       technicianIds: technicianIds,
     };
 
