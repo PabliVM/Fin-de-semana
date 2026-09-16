@@ -44,8 +44,9 @@ function setupEvents() {
 
 function boot() {
   const savedTab = safeStorageGet('rm-active-tab');
-  if (savedTab && TABS.some(function (t) { return t.key === savedTab; })) {
-    setState({ activeTab: savedTab });
+  const savedTabInfo = savedTab && TABS.find(function (t) { return t.key === savedTab; });
+  if (savedTabInfo) {
+    setState({ activeTab: savedTabInfo.key, activeGroup: savedTabInfo.group });
   }
 
   renderHeader();
