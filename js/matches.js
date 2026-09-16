@@ -36,7 +36,7 @@ function renderPanelCalendarioEquipos(container) {
       '<div style="display:flex;gap:8px;align-items:center">' +
         '<select class="rm-select" id="cal-team-filter" style="min-height:36px;width:190px">' +
           '<option value="">Todos los equipos</option>' +
-          TEAMS.map(function (t) { return '<option value="' + t.id + '"' + (t.id === teamFilter ? ' selected' : '') + '>' + safeText(t.name) + '</option>'; }).join('') +
+          TEAMS.map(function (t) { return '<option value="' + t.id + '"' + (t.id === teamFilter ? ' selected' : '') + '>' + safeText(t.short) + '</option>'; }).join('') +
         '</select>' +
         '<button class="rm-button rm-button--ghost rm-button--small" id="btn-import-matches" type="button">📋 Carga por lista</button>' +
         '<button class="rm-button rm-button--primary rm-button--small" id="btn-add-match" type="button">+ Nuevo partido</button>' +
@@ -98,7 +98,7 @@ function openMatchModal(match) {
       '</div>' +
       '<div class="rm-field"><label class="rm-label">Equipo</label>' +
         '<select class="rm-select" id="m-team">' +
-          TEAMS.map(function (t) { return '<option value="' + t.id + '"' + (match && match.teamId === t.id ? ' selected' : '') + '>' + safeText(t.name) + '</option>'; }).join('') +
+          TEAMS.map(function (t) { return '<option value="' + t.id + '"' + (match && match.teamId === t.id ? ' selected' : '') + '>' + safeText(t.short) + '</option>'; }).join('') +
         '</select></div>' +
       '<div class="rm-field"><label class="rm-label">Rival</label>' +
         '<input class="rm-input" id="m-rival" type="text" value="' + safeText(match ? match.rival : '') + '" placeholder="Nombre del rival" /></div>' +
