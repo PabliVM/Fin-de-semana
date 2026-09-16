@@ -296,6 +296,7 @@
 
 .matrix-edge-start {
   border-left: 3px solid var(--rm-brand-gold) !important;
+  border-right: 2px solid var(--rm-brand-gold) !important;
 }
 
 .matrix-edge-end {
