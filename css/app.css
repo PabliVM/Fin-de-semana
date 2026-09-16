@@ -2,6 +2,24 @@
 
 .hidden { display: none !important; }
 
+.rm-groups-nav {
+  background: var(--rm-brand-primary-deep);
+  border-bottom: 0;
+  padding: 8px 24px;
+}
+
+.rm-groups-nav .rm-nav-button {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rm-groups-nav .rm-nav-button.is-active {
+  background: var(--rm-white);
+  border-color: var(--rm-white);
+  color: var(--rm-brand-primary-deep);
+}
+
 .rm-header {
   position: sticky;
   top: 0;
