@@ -61,6 +61,7 @@ function boot() {
     initTimeOffData();
     initFridayShiftsData();
     initMatchesData();
+    initSeasonsData();
   }
 }
 
