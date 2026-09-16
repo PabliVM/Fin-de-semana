@@ -59,7 +59,7 @@ function renderPanelInicio(container) {
           monthGroups.map(function (g) { return '<th colspan="' + g.count + '" class="matrix-month">' + g.label + '</th>'; }).join('') +
         '</tr>' +
         '<tr>' +
-          days.map(function (d) { return '<th class="matrix-day' + (isWeekendDay(d) ? ' matrix-day--weekend' : '') + '">' + d.slice(8, 10) + '</th>'; }).join('') +
+          days.map(function (d) { return '<th class="matrix-day' + (isWeekendDay(d) ? ' matrix-day--weekend' : '') + weekendEdgeClass(d) + '">' + d.slice(8, 10) + '</th>'; }).join('') +
         '</tr>' +
       '</thead>' +
       '<tbody>' +
@@ -67,9 +67,9 @@ function renderPanelInicio(container) {
       '</tbody>' +
     '</table></div>';
 
-  qsa('.match-dot', container).forEach(function (dot) {
-    dot.addEventListener('click', function () {
-      const match = state.matches.find(function (m) { return m.id === dot.dataset.matchId; });
+  qsa('.match-tech-grid', container).forEach(function (grid) {
+    grid.addEventListener('click', function () {
+      const match = state.matches.find(function (m) { return m.id === grid.dataset.matchId; });
       if (match) openMatchModal(match);
     });
   });
@@ -93,6 +93,13 @@ function isWeekendDay(dayISO) {
   return dow === 0 || dow === 6;
 }
 
+function weekendEdgeClass(dayISO) {
+  const dow = new Date(dayISO + 'T00:00:00').getDay();
+  if (dow === 6) return ' matrix-edge-start';
+  if (dow === 0) return ' matrix-edge-end';
+  return '';
+}
+
 function renderMatrixRow(team, days) {
   return (
     '<tr>' +
@@ -104,25 +111,29 @@ function renderMatrixRow(team, days) {
 
 function renderMatrixCell(teamId, dayISO) {
   const matches = matchesForCell(teamId, dayISO);
-  if (!matches.length) return '<td class="matrix-cell' + (isWeekendDay(dayISO) ? ' matrix-cell--weekend' : '') + '"></td>';
+  const cls = 'matrix-cell' + (isWeekendDay(dayISO) ? ' matrix-cell--weekend' : '') + weekendEdgeClass(dayISO);
+  if (!matches.length) return '<td class="' + cls + '"></td>';
 
   const blocks = matches.map(function (m) {
-    const techs = (m.technicianIds || [])
-      .map(function (id) { const t = state.technicians.find(function (x) { return x.id === id; }); return t ? t.initials : '?'; })
-      .join(', ');
+    const initials = (m.technicianIds || [])
+      .map(function (id) { const t = state.technicians.find(function (x) { return x.id === id; }); return t ? t.initials : '?'; });
+    const techsText = initials.join(', ');
     const title = (m.time || '') + ' ' + (m.homeAway === 'visitante' ? '@' : 'vs') + ' ' + (m.rival || '?') +
-      ' [' + matchTypeLabel(m.type) + (m.jornada ? ' J' + m.jornada : '') + ']' + (techs ? ' — Técnicos: ' + techs : ' — sin técnico');
-    const dot = '<span class="match-dot match-dot--' + safeText(m.type || 'liga') + '" data-match-id="' + m.id + '" title="' + safeText(title) + '">' + safeText(techs || '') + '</span>';
+      ' [' + matchTypeLabel(m.type) + (m.jornada ? ' J' + m.jornada : '') + ']' + (techsText ? ' — Técnicos: ' + techsText : ' — sin técnico');
+    const cells = initials.length
+      ? initials.map(function (i) { return '<span class="match-tech-cell">' + safeText(i) + '</span>'; }).join('')
+      : '<span class="match-tech-cell match-tech-cell--empty">·</span>';
+    const grid = '<div class="match-tech-grid match-tech-grid--' + safeText(m.type || 'liga') + '" data-match-id="' + m.id + '" title="' + safeText(title) + '">' + cells + '</div>';
     const addSelect = renderMatrixTechAdd(m);
-    return '<div class="matrix-match-block">' + dot + addSelect + '</div>';
+    return '<div class="matrix-match-block">' + grid + addSelect + '</div>';
   }).join('');
 
-  return '<td class="matrix-cell' + (isWeekendDay(dayISO) ? ' matrix-cell--weekend' : '') + '"><div class="matrix-cell__dots">' + blocks + '</div></td>';
+  return '<td class="' + cls + '"><div class="matrix-cell__dots">' + blocks + '</div></td>';
 }
 
 function renderMatrixTechAdd(m) {
   const assigned = m.technicianIds || [];
-  if (assigned.length >= 3) return '';
+  if (assigned.length >= 4) return '';
   const available = state.technicians.filter(function (t) { return t.active !== false && assigned.indexOf(t.id) === -1; });
   if (!available.length) return '';
   return (
