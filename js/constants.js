@@ -41,13 +41,18 @@ const TEAMS = [
   { id: 'debutante', name: 'Debutante', short: 'DB' },
 ];
 
+const TAB_GROUPS = [
+  { key: 'equipos', label: 'Equipos' },
+  { key: 'coordinadores', label: 'Coordinadores' },
+];
+
 const TABS = [
-  { key: 'inicio', label: 'Inicio' },
-  { key: 'tecnicos', label: 'Técnicos' },
-  { key: 'libranzas', label: 'Libranzas' },
-  { key: 'viernes', label: 'Turno viernes tarde' },
-  { key: 'calendario-equipos', label: 'Calendario equipos' },
-  { key: 'informe', label: 'Informe general' },
+  { key: 'inicio', label: 'Inicio', group: 'equipos' },
+  { key: 'calendario-equipos', label: 'Calendario equipos', group: 'equipos' },
+  { key: 'tecnicos', label: 'Técnicos', group: 'coordinadores' },
+  { key: 'libranzas', label: 'Libranzas', group: 'coordinadores' },
+  { key: 'viernes', label: 'Turno viernes tarde', group: 'coordinadores' },
+  { key: 'informe', label: 'Informe', group: 'coordinadores' },
 ];
 
 const MATCH_TYPES = [
