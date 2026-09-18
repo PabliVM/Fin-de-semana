@@ -147,8 +147,10 @@ function openMatchModal(match) {
       '<div class="rm-grid">' +
         sortedTechnicians().filter(function (t) { return t.active !== false; }).map(function (t) {
           const checked = match && (match.technicianIds || []).indexOf(t.id) !== -1;
-          return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--rm-text)">' +
-            '<input type="checkbox" class="m-tech" value="' + t.id + '"' + (checked ? ' checked' : '') + ' /> ' + safeText(t.fullName) +
+          const refDate = match ? match.date : todayISO();
+          const off = isTechOffOnDate(t.id, refDate);
+          return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:' + (off ? 'var(--rm-text-muted)' : 'var(--rm-text)') + '"' + (off ? ' title="Libra ese día"' : '') + '>' +
+            '<input type="checkbox" class="m-tech" value="' + t.id + '"' + (off ? ' data-off="1"' : '') + (checked ? ' checked' : '') + (off && !checked ? ' disabled' : '') + ' /> ' + safeText(t.fullName) + (off ? ' (libra)' : '') +
           '</label>';
         }).join('') +
       '</div>' +
@@ -164,7 +166,10 @@ function openMatchModal(match) {
 
   function enforceTechLimit() {
     const checked = qsa('.m-tech:checked', backdrop);
-    qsa('.m-tech', backdrop).forEach(function (cb) { cb.disabled = !cb.checked && checked.length >= 4; });
+    qsa('.m-tech', backdrop).forEach(function (cb) {
+      if (cb.checked) { cb.disabled = false; return; }
+      cb.disabled = cb.dataset.off === '1' || checked.length >= 4;
+    });
   }
   qsa('.m-tech', backdrop).forEach(function (cb) { cb.addEventListener('change', enforceTechLimit); });
   enforceTechLimit();
