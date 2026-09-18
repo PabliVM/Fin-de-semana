@@ -42,11 +42,12 @@ function matchesForCell(teamId, dayISO) {
 function renderPanelInicio(container) {
   if (!container) return;
   const prevWrap = qs('.matrix-wrap', container);
+  const alreadyScrolled = prevWrap && prevWrap.dataset.scrolled === '1';
   const days = matrixDayRange();
   const todayIndex = days.indexOf(todayISO());
   const defaultScrollLeft = todayIndex > -1 ? Math.max(0, todayIndex * 70 - 300) : 0;
-  const scrollLeft = prevWrap ? prevWrap.scrollLeft : defaultScrollLeft;
-  const scrollTop = prevWrap ? prevWrap.scrollTop : 0;
+  const scrollLeft = alreadyScrolled ? prevWrap.scrollLeft : defaultScrollLeft;
+  const scrollTop = alreadyScrolled ? prevWrap.scrollTop : 0;
 
   const monthGroups = matrixMonthGroups(days);
   const techs = state.technicians;
@@ -80,7 +81,11 @@ function renderPanelInicio(container) {
     '</table></div>';
 
   const newWrap = qs('.matrix-wrap', container);
-  if (newWrap) { newWrap.scrollLeft = scrollLeft; newWrap.scrollTop = scrollTop; }
+  if (newWrap) {
+    newWrap.scrollLeft = scrollLeft;
+    newWrap.scrollTop = scrollTop;
+    if (!container.classList.contains('hidden')) newWrap.dataset.scrolled = '1';
+  }
 
   qsa('.match-tech-grid', container).forEach(function (grid) {
     grid.addEventListener('click', function () {
