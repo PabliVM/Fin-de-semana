@@ -155,7 +155,10 @@ function renderMatrixTechAdd(m) {
   return (
     '<select class="matrix-tech-add" data-match-id="' + m.id + '" title="Añadir técnico">' +
       '<option value="">+</option>' +
-      available.map(function (t) { return '<option value="' + t.id + '">' + safeText(t.initials) + '</option>'; }).join('') +
+      available.map(function (t) {
+        const off = isTechOffOnDate(t.id, m.date);
+        return '<option value="' + t.id + '"' + (off ? ' disabled' : '') + '>' + safeText(t.initials) + (off ? ' (libra)' : '') + '</option>';
+      }).join('') +
     '</select>'
   );
 }
